@@ -1,6 +1,6 @@
+  <h1 align="center">Quaich Tour Leaderboard App</h1>
 <a href="https://www.scottishdiscgolfassociation.co.uk/quaich-tour">
-  <img alt="Quaich Tour 2024 Schedule and Link to SDGA site" src="https://static.wixstatic.com/media/a6625d_98f050e9b1de4916835e3cdfe4c94ffb~mv2.png/v1/fill/w_962,h_1150,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/Quaich-Tour-2024-Schedule-ver4.png">
-  <h1 align="center">Quaich Tour 2024</h1>
+  <img height=300px alt="Quaich Tour 2024 Schedule and Link to SDGA site" src="https://static.wixstatic.com/media/a6625d_98f050e9b1de4916835e3cdfe4c94ffb~mv2.png/v1/fill/w_962,h_1150,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/Quaich-Tour-2024-Schedule-ver4.png">
 </a>
 
 <p align="center">
