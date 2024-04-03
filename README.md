@@ -9,7 +9,7 @@
 
 ## Features
 
-- Displays the up-to-date Quaich Tour standings both Overall and by Division
+- Displays the up-to-date Quaich Tour standings both Overall, by Division as well as each Tournament
 - User Profiles: Tour Players and Tournament Directors can create personal profiles
 - Results: Tournament Directors will have special access to Upload official tournament results from the PDGA .CSV exports. This automatically generates the updated Tour standings
 - Stats: Ongoing player Stats will be generated throughout the season for every Tour player as the results are updated
