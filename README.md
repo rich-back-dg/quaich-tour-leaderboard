@@ -1,6 +1,6 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
+<a href="https://www.scottishdiscgolfassociation.co.uk/quaich-tour">
+  <img alt="Quaich Tour 2024 Schedule and Link to SDGA site" src="https://static.wixstatic.com/media/a6625d_98f050e9b1de4916835e3cdfe4c94ffb~mv2.png/v1/fill/w_962,h_1150,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/Quaich-Tour-2024-Schedule-ver4.png">
+  <h1 align="center">Quaich Tour 2024</h1>
 </a>
 
 <p align="center">
