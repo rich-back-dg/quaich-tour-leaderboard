@@ -1,10 +1,15 @@
+import Image from "next/image";
 import Link from "next/link";
-import { headers } from "next/headers";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import SignupDialog from "./SignupDialog";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { SubmitButton } from "./submit-button";
+import { SubmitButton } from "../../components/submit-button";
 
-export default function Login({
+export default function LoginPage({
   searchParams,
 }: {
   searchParams: { message: string };
@@ -25,95 +30,78 @@ export default function Login({
       return redirect("/login?message=Could not authenticate user");
     }
 
-    return redirect("/protected");
-  };
-
-  const signUp = async (formData: FormData) => {
-    "use server";
-
-    const origin = headers().get("origin");
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const supabase = createClient();
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${origin}/auth/callback`,
-      },
-    });
-
-    if (error) {
-      return redirect("/login?message=Could not authenticate user");
-    }
-
-    return redirect("/login?message=Check email to continue sign in process");
+    return redirect("/");
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
-      <Link
-        href="/"
-        className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1"
-        >
-          <polyline points="15 18 9 12 15 6" />
-        </svg>{" "}
-        Back
-      </Link>
+    <div className="p-16 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-yellow-200/40 to-yellow-500/30 min-h-screen flex">
+      <div className="w-full lg:grid lg:min-h-[500px] lg:grid-cols-2 xl:min-h-[700px] rounded-xl shadow-xl bg-zinc-50 ">
+        <div className="hidden lg:block ">
+          <Image
+            src="/farewell-fanmore.jpeg"
+            alt="Image"
+            width="1920"
+            height="1080"
+            className="h-full w-full object-[75%] object-cover dark:brightness-[0.2] dark:grayscale saturate-150 shadow-lg rounded-tl-xl rounded-bl-xl"
+          />
+        </div>
 
-      <form className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground">
-        <label className="text-md" htmlFor="email">
-          Email
-        </label>
-        <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
-          name="email"
-          placeholder="you@example.com"
-          required
-        />
-        <label className="text-md" htmlFor="password">
-          Password
-        </label>
-        <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
-          type="password"
-          name="password"
-          placeholder="••••••••"
-          required
-        />
-        <SubmitButton
-          formAction={signIn}
-          className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2"
-          pendingText="Signing In..."
-        >
-          Sign In
-        </SubmitButton>
-        <SubmitButton
-          formAction={signUp}
-          className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
-          pendingText="Signing Up..."
-        >
-          Sign Up
-        </SubmitButton>
-        {searchParams?.message && (
-          <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
-            {searchParams.message}
-          </p>
-        )}
-      </form>
+        <div className="flex items-center justify-center py-12 animate-in">
+          <div className="mx-auto grid w-[350px] gap-6">
+            <div className="grid gap-2 text-center">
+              <h1 className="text-3xl font-bold">Login</h1>
+              <p className="text-balance text-muted-foreground">
+                Enter your email below to login to your account
+              </p>
+            </div>
+            <form className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  name="email"
+                  placeholder="m@example.com"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+
+                  {/* TODO: Add password reset functionality */}
+
+                  <Link
+                    href="/forgot-password"
+                    className="ml-auto inline-block text-sm underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+                <Input id="password" type="password" name="password" required />
+              </div>
+              <SubmitButton
+                formAction={signIn}
+                className="h-10 rounded-md px-8 bg-zinc-900 text-zinc-50 shadow hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90"
+                pendingText="Logging in..."
+              >
+                Login
+              </SubmitButton>
+              {searchParams?.message && (
+                <Alert variant="destructive">
+                  <ExclamationTriangleIcon className="h-4 w-4" />
+                  <AlertTitle>There was a problem</AlertTitle>
+                  <AlertDescription>{searchParams.message}</AlertDescription>
+                </Alert>
+              )}
+            </form>
+            <div className="mt-4 text-center text-sm">
+              Don&apos;t have an account?
+            </div>
+            <SignupDialog />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
