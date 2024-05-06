@@ -1,32 +1,15 @@
-import { createClient } from "@/utils/supabase/server";
-
-const supabase = createClient();
-
-async function getLeaderboardData() {
-  const { data: leaderboard_data, error } = await supabase.from("tour_leaderboard").select();
-  const { data: results } = await supabase.from("results").select();
-
-
-  if (error) {
-    console.error("Could not fetch leaderboard data: ", error.message);
-  }
-
-  console.table(leaderboard_data);
-  console.log([results])
-}
+import StandingsTable from "./StandingsTable";
 
 export default async function Index() {
-  const results = await getLeaderboardData();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-20 items-center">
-      <div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-4xl px-3">
-        <main className="flex-1 flex flex-col gap-6">
+    <div className="flex-1 flex flex-col gap-20 items-center w-full bg-sky-50">
+      <div className="animate-in flex flex-col items-center gap-20 opacity-0 w-full px-5">
+        <main className="flex-1 flex flex-col gap-6 w-full items-center ">
           <h2 className="font-bold text-4xl my-4">LEADERBOARD</h2>
+          <div className="w-full py-4">
+            <StandingsTable />
+          </div>
         </main>
       </div>
 
