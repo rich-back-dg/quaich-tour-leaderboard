@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Division } from "./types"
+import { CSVRow } from "./csvToJson"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -81,4 +82,30 @@ export const sortDivisionsByRanking = (a: string, b: string): number => {
 
   // Compare ranks and return the result
   return rankA - rankB;
+};
+
+export function pointsCalculation(position: number, multiplier: number, data: CSVRow[]) {
+  const numberOfPlayers = data.length;
+
+  const adjustment1 = 1 + multiplier / 100;
+
+  const calc =
+    1 + Math.floor(((numberOfPlayers - position) / (numberOfPlayers - 1)) * 99);
+
+  return Math.floor(adjustment1 * calc);
+}
+
+const pr = new Intl.PluralRules("en-US", { type: "ordinal" });
+
+const suffixes = new Map([
+  ["one", "st"],
+  ["two", "nd"],
+  ["few", "rd"],
+  ["other", "th"],
+]);
+
+export const formatOrdinals = (n: number) => {
+  const rule = pr.select(n);
+  const suffix = suffixes.get(rule);
+  return `${n}${suffix}`;
 };
