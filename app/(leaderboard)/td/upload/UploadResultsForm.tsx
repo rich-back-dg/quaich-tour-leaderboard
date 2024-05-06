@@ -6,17 +6,18 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { uploadResults } from "./UploadResultsFormAction";
 import { Course, EventRounds, Layout, uploadFormSchema } from "@/lib/types";
-import { getCourses } from "@/utils/supabase/getCourses";
+import { getCourses } from "@/db/queries";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { DateRange } from "react-day-picker";
 import LayoutsPerDivisionForm from "./LayoutsPerDivisionForm";
 import {
-  divisionRankings,
+  pointsCalculation,
   sortDivisionsByRanking,
   sortGroupedDivisionsByRanking,
 } from "@/lib/utils";
-import { getLayoutsForCourse } from "@/utils/supabase/getLayoutsForCourse";
+import { getLayoutsForCourse } from "@/db/queries";
 import {
   Accordion,
   AccordionContent,
@@ -30,6 +31,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import DatePickerWithRange from "@/components/DateRangePicker";
 
 export default function UploadResultsForm() {
   const [resultsFile, setResultsFile] = useState<File | null>(null);
@@ -37,6 +39,7 @@ export default function UploadResultsForm() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [layouts, setLayouts] = useState<Layout[]>([]);
   const [selectedCourseID, setSelectedCourseID] = useState("");
+  const [date, setDate] = useState<DateRange | undefined>();
   const [switchState, setSwitchState] = useState<boolean>(false);
   const [divisionsList, setDivisionsList] = useState<string[]>([]);
   const [numberOfRounds, setNumberOfRounds] = useState<number>(0);
@@ -85,6 +88,26 @@ export default function UploadResultsForm() {
     fetchResultsInfo();
   }, [switchState]);
 
+  const getNumRoundsFromFile = (data: CSVRow[]) => {
+    let keys: string[] = [];
+    data.map((element) => {
+      keys = Object.keys(element);
+    });
+    return keys.filter((key) => key.includes("Rd")).length;
+  };
+
+  const getDivisionsFromFile = (data: CSVRow[]): string[] => {
+    const divs = data.map((element) => element.Division);
+    const uniqueDivs = (arr: string[]): string[] => {
+      return arr.filter((item, index) => arr.indexOf(item) === index);
+    };
+    const divisions = uniqueDivs(divs);
+    divisions.sort(sortDivisionsByRanking);
+    return divisions;
+  };
+
+  // <<- HANDLER FUNCTIONS ->>
+
   const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (fileList && fileList.length > 0) {
@@ -112,23 +135,7 @@ export default function UploadResultsForm() {
     return switchState ? "open" : "close";
   };
 
-  const getNumRoundsFromFile = (data: CSVRow[]) => {
-    let keys: string[] = [];
-    data.map((element) => {
-      keys = Object.keys(element);
-    });
-    return keys.filter((key) => key.includes("Rd")).length;
-  };
-
-  const getDivisionsFromFile = (data: CSVRow[]): string[] => {
-    const divs = data.map((element) => element.Division);
-    const uniqueDivs = (arr: string[]): string[] => {
-      return arr.filter((item, index) => arr.indexOf(item) === index);
-    };
-    const divisions = uniqueDivs(divs);
-    divisions.sort(sortDivisionsByRanking);
-    return divisions;
-  };
+  // <<- FILE DATA PROCESSING FUNCTIONS ->>
 
   const groupDivisionsByLayouts = (data: EventRounds[]): string[][] => {
     // Create a mapping of layouts to divisions
@@ -163,7 +170,47 @@ export default function UploadResultsForm() {
     return groups;
   }
 
-  function calculateOverallPlacing(
+  // Helper function to filter out any DNFs
+  function filterOutDNFs(data: CSVRow[]): CSVRow[] {
+    const dataToFilter: CSVRow[] = [...data];
+    const filteredData: CSVRow[] = dataToFilter.filter(
+      (row) => row.Total !== "999" && row.Total !== "888"
+    );
+    return filteredData;
+  }
+
+  // Helper function to create temp PDGANum for players without one
+  function handleEmptyPDGANum(data: CSVRow[]): CSVRow[] {
+    const dataToCheck: CSVRow[] = [...data];
+    dataToCheck.forEach((player) => {
+      if (player.PDGANum === "") {
+        const nameToAdd = "@" + player.FirstName + player.LastName;
+        player.PDGANum = nameToAdd;
+      }
+    });
+    return dataToCheck;
+  }
+
+  function calculateOverallPlacingForSingleLayout(data: CSVRow[]): CSVRow[] {
+    const sortedData: CSVRow[] = [...data];
+
+    const numericSort = (a: CSVRow, b: CSVRow) =>
+      parseFloat(a.Total) - parseFloat(b.Total);
+    const sortedNumericData: CSVRow[] = sortedData.sort(numericSort);
+
+    let currentPosition = 1;
+    sortedNumericData.forEach((player, index) => {
+      if (index > 0 && player.Total !== sortedNumericData[index - 1].Total) {
+        currentPosition = index + 1;
+      }
+      player.overall_placing = currentPosition;
+    });
+
+    return sortedNumericData;
+  }
+
+  // Helper function for overallPlacingsFromGroups function
+  function calculateOverallPlacingForMultipleLayouts(
     jsonData: CSVRow[],
     startingPosition: number
   ): CSVRow[] {
@@ -188,7 +235,7 @@ export default function UploadResultsForm() {
     let startingPosition = 1;
 
     data.forEach((group, index) => {
-      calculateOverallPlacing(group, startingPosition);
+      calculateOverallPlacingForMultipleLayouts(group, startingPosition);
       startingPosition += group.length;
     });
 
@@ -196,32 +243,68 @@ export default function UploadResultsForm() {
     return flattenedData.sort((a, b) => a.overall_placing - b.overall_placing);
   }
 
-  // Example Usage
-  const groupings = [
-    ["MPO", "MA1", "MA40"],
-    ["FA1", "MA50", "MA2", "MA3"],
-    ["FA40", "MJ10", "FA3", "MA4", "MJ12"],
-  ];
+  // Helper function to calculate event points
+  function calculateTourPoints(data: CSVRow[], isMajor: boolean) {
+    return data.map((player) => ({
+      ...player,
+      event_points: pointsCalculation(
+        player.overall_placing,
+        isMajor ? 20 : 0,
+        data
+      ),
+    }));
+  }
 
-  const groupedData = groupResultsByDivision(fileData, groupings);
-  //   console.table(overallPlacingsFromGroups(groupedData))
+  function processFileData(data: CSVRow[], isMultipleLayouts: boolean, isMajor: boolean) {
+    // Filter out DNFs
+    const dataWithDNFsFiltered = filterOutDNFs(data);
+
+    // Check PDGA Numbers and populate any empty occurences
+    const dataWithPDGANumsChecked = handleEmptyPDGANum(dataWithDNFsFiltered);
+
+    let dataWithOverallPlacings: CSVRow[] | undefined;
+
+    // Check if divisions didn't all play the same layout and Calculate placings accordingly
+    if (isMultipleLayouts) {
+      // Establish Division groupings based on layoutPerDivision
+      const divisionGroupings = groupDivisionsByLayouts(layoutsPerDivision);
+      // Group the fileData rows by the established groupings
+      const resultsDataGroupings = groupResultsByDivision(
+        dataWithPDGANumsChecked,
+        divisionGroupings
+      );
+      // Populate the overall placings from the resultsDataGroupings
+      dataWithOverallPlacings = overallPlacingsFromGroups(resultsDataGroupings);
+    } else {
+      // We only need to run the simplified single layout placings calculation
+      dataWithOverallPlacings = calculateOverallPlacingForSingleLayout(
+        dataWithPDGANumsChecked
+      );
+    }
+
+    // Calculate tour points and return
+    const dataWithTourPoints = calculateTourPoints(dataWithOverallPlacings, isMajor);
+    return dataWithTourPoints;
+  }
+
 
   const uploadFormClientAction = async (formData: FormData) => {
     const tournamentName = formData.get("tournamentName") as string;
-    const date = formData.get("date");
     const isMajor = formData.get("isMajor") === null ? false : true;
     const isMultipleLayouts =
       formData.get("isMultipleLayouts") === null ? false : true;
-    const divisionGroupings = groupDivisionsByLayouts(layoutsPerDivision);
+
+    console.log(isMajor)
+
+    const fileDataToUpload = processFileData(fileData, isMultipleLayouts, isMajor);
 
     const newUpload = {
-      fileData: fileData,
+      fileData: fileDataToUpload,
       tournamentName: tournamentName,
       date: date,
       isMajor: isMajor,
       isMultipleLayouts: isMultipleLayouts,
       course_id: selectedCourseID,
-      divisionGroupings: divisionGroupings,
     };
 
     const result = uploadFormSchema.safeParse(newUpload);
@@ -286,12 +369,16 @@ export default function UploadResultsForm() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="date">Date: </Label>
-                <Input type="date" name="date" />
+                <DatePickerWithRange date={date} setDate={setDate} />
               </div>
 
               <div className="flex gap-3 items-center ">
                 <Label htmlFor="isMajor">Is it a Major?: </Label>
-                <Input type="checkbox" name="isMajor" className="w-4" />
+                <Input
+                  type="checkbox"
+                  name="isMajor"
+                  className="w-4"
+                />
               </div>
 
               <div className="flex items-center space-x-4">
@@ -306,6 +393,7 @@ export default function UploadResultsForm() {
                   </p>
                   <Switch
                     name="isMultipleLayouts"
+                    disabled={resultsFile ? false : true}
                     onCheckedChange={(e) => handleSwitchSelect(e)}
                   />
                   <p

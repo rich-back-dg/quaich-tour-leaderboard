@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { uploadFormSchema } from "@/lib/types";
-import { SafeParseReturnType } from "zod";
 
 const supabase = createClient();
 
@@ -13,70 +12,11 @@ interface PlayerData {
   FirstName: string;
   LastName: string;
   PDGANum: string;
-  overall_placing?: number; // Optional since it will be added by the function
   Prize: string;
   Division: string;
   Place: string;
-}
-
-function groupResultsByDivision(data: PlayerData[], groupings: string[][]) {
-  let groups: PlayerData[][][] = [];
-
-  groupings.forEach((group, index) => {
-    groups[index] = [];
-    group.forEach((division) => {
-      const matches = data.filter((result) => result.Division === division);
-      groups[index] = groups[index].concat(matches);
-    });
-  });
-  return groups;
-}
-
-function calculateOverallPlacing(jsonData: PlayerData[]): PlayerData[] {
-  const sortedData: PlayerData[] = [...jsonData];
-
-  const numericSort = (a: PlayerData, b: PlayerData) =>
-    parseFloat(a.Total) - parseFloat(b.Total);
-  const sortedNumericData: PlayerData[] = sortedData.sort(numericSort);
-
-  let currentPosition = 1;
-  sortedNumericData.forEach((player, index) => {
-    if (index > 0 && player.Total !== sortedNumericData[index - 1].Total) {
-      currentPosition = index + 1;
-    }
-    player.overall_placing = currentPosition;
-  });
-
-  return sortedNumericData;
-}
-
-function handleEmptyPDGANum(jsonData: PlayerData[]): PlayerData[] {
-  const dataToCheck: PlayerData[] = [...jsonData];
-  dataToCheck.forEach((player) => {
-    if (player.PDGANum === "") {
-      const nameToAdd = "@" + player.FirstName + player.LastName;
-      player.PDGANum = nameToAdd;
-    }
-  });
-  return dataToCheck;
-}
-
-// Helper function to filter out any DNFs
-function filterOutDNFs(jsonData: PlayerData[]): PlayerData[] {
-  const dataToFilter: PlayerData[] = [...jsonData];
-  const filteredData: PlayerData[] = dataToFilter.filter(
-    (row) => row.Total !== "999" && row.Total !== "888"
-  );
-
-  return filteredData;
-}
-
-function processCSVData(jsonData: PlayerData[]): PlayerData[] {
-  const dataWithDNFsRemoved = filterOutDNFs(jsonData);
-  const jsonDataPDGANumChecked = handleEmptyPDGANum(dataWithDNFsRemoved);
-  const jsonDataWithPlacing = calculateOverallPlacing(jsonDataPDGANumChecked);
-
-  return jsonDataWithPlacing;
+  overall_placing: number;
+  event_points: number;
 }
 
 // Function to insert all data
@@ -92,12 +32,13 @@ async function insertData(jsonData: PlayerData[], formData: any) {
         course_id: formData.course_id,
       },
     ])
-    .select("tournament_id");
+    .select("id")
+    .single();
 
   let tournamentID: string | undefined;
 
   if (tournamentData) {
-    tournamentID = tournamentData[0].tournament_id;
+    tournamentID = tournamentData.id;
   } else {
     console.error(tournamentError);
   }
@@ -107,14 +48,14 @@ async function insertData(jsonData: PlayerData[], formData: any) {
     .from("players")
     .select()
     .in(
-      "PDGANum",
+      "pdga_num",
       jsonData.map((row) => row.PDGANum)
     );
 
   const newPlayers = jsonData.filter(
     (row) =>
       !existingPlayers?.some(
-        (existingPlayer) => existingPlayer.PDGANum === row.PDGANum
+        (existingPlayer) => existingPlayer.pdga_num === row.PDGANum
       )
   );
 
@@ -123,9 +64,10 @@ async function insertData(jsonData: PlayerData[], formData: any) {
     .from("players")
     .upsert(
       newPlayers.map((row) => ({
-        FirstName: row.FirstName,
-        LastName: row.LastName,
-        PDGANum: row.PDGANum,
+        first_name: row.FirstName,
+        last_name: row.LastName,
+        pdga_num: row.PDGANum,
+        division: row.Division,
       }))
     )
     .select();
@@ -136,28 +78,28 @@ async function insertData(jsonData: PlayerData[], formData: any) {
   // Upsert Results for each player
   for (let i = 0; i < jsonData.length; i++) {
     const currentPlayer = allPlayerData?.find(
-      (player) => player.PDGANum === jsonData[i].PDGANum
+      (player) => player.pdga_num === jsonData[i].PDGANum
     );
-    const currentPlayerID = currentPlayer.player_id;
+    const currentPlayerID = currentPlayer.id;
 
-    const { data, error } = await supabase
+    const { data: resultsData, error: resultsError } = await supabase
       .from("results")
       .upsert([
         {
           tournament_id: tournamentID,
           player_id: currentPlayerID,
-          Total: jsonData[i].Total,
-          Prize: jsonData[i].Prize,
-          Division: jsonData[i].Division,
+          total: jsonData[i].Total,
+          prize: jsonData[i].Prize,
+          division: jsonData[i].Division,
           division_placing: jsonData[i].Place,
           overall_placing: jsonData[i].overall_placing,
-          // event_points: jsonData[i].event_points,
+          event_points: jsonData[i].event_points,
         },
       ])
-      .select("result_id");
+      .select("id");
 
-    if (error) {
-      console.log(error.message);
+    if (resultsError) {
+      console.log(resultsError.message);
     }
   }
 }
@@ -176,19 +118,10 @@ export async function uploadResults(newUpload: unknown) {
     };
   }
 
-  if (result.data.divisionGroupings) {
-    console.log(
-      groupResultsByDivision(
-        result.data.fileData,
-        result.data.divisionGroupings
-      )
-    );
-  }
+  const dataToAdd = result.data.fileData;
 
-  // const dataToAdd = processCSVData(result.data.fileData)
+  insertData(dataToAdd, result.data);
 
-  // insertData(dataToAdd, result.data)
-
-  // revalidatePath("/td")
-  // redirect("/td")
+  revalidatePath("/td");
+  redirect("/td");
 }
