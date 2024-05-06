@@ -30,26 +30,6 @@ export type EventRounds = {
   }[]
 }
 
-// export type ResultsFileData = {
-//   Division: string,
-//   FirstName: string,
-//   Hole: string,
-//   LastName: string,
-//   PDGANum: string,
-//   Phone: string,
-//   Place: string,
-//   Prize: string,
-//   Rd1: string,
-//   Rd2?: string,
-//   Rd3?: string,
-//   Rd4?: string,
-//   Rd5?: string,
-//   Rd6?: string,
-//   Start: string,
-//   TeeTime: string,
-//   Total: string,
-// }
-
 export const LayoutSchema = z.object({
   layout_name: z.string(),
   holePars: z.array(
@@ -63,7 +43,6 @@ export const LayoutSchema = z.object({
 
 export const CourseSchema = z.object({
   course_name: z.string(),
-  course_id: z.number(),
 });
 
 export const uploadFormSchema = z.object({
@@ -88,14 +67,65 @@ export const uploadFormSchema = z.object({
       Start: z.string(),
       TeeTime: z.string(),
       Total: z.string(),
+      overall_placing: z.number(),
+      event_points: z.number(),
     })
   ),
   tournamentName: z.string(),
-  date: z.coerce.date(),
-  isMajor: z.boolean(),
+  date: z.object({
+    from: z.coerce.date(),
+    to: z.coerce.date(),
+  }),
   course_id: z.string(),
   isMultipleLayouts: z.boolean(),
-  divisionGroupings: z.array(
-    z.array(z.string())
-  ).optional()
+  isMajor: z.boolean()
 });
+
+export const TournamentFormSchema = z.object({
+  tournamentName: z.string(),
+  date: z.object({
+    from: z.coerce.date(),
+    to: z.coerce.date(),
+  }),
+  course_id: z.string(),
+  isMajor: z.boolean()
+}).partial()
+
+export type LeaderboardRow = {
+  name: string;
+  PDGANum: string;
+  rank: number;
+  events_played: number;
+  total_tour_points: {total: number, best: number};
+}
+
+export type LeaderboardResults = {
+  player_id: string;
+  events_played: number;
+  total_tour_points: number;
+  player_results: PlayerResult[];
+  rank: number;
+  name: string;
+}
+
+export type Tournament = {
+  id: string;
+  course_id: number;
+  tournament_name: string;
+  isMajor: boolean;
+  date: {to: Date, from: Date}
+  courses: {course_name: string};
+}
+
+export type PlayerResult = {
+    id: string,
+    prize: string,
+    total: string,
+    division: string,
+    created_at: Date,
+    is_counted: boolean,
+    event_points: number,
+    tournament_id: string,
+    overall_placing: number,
+    division_placing: string,
+}
