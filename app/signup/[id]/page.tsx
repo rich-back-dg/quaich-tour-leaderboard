@@ -1,5 +1,4 @@
 import SignupForm from "@/app/login/SignupForm";
-import { SearchParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 import Image from "next/image";
 
 type Props = {
