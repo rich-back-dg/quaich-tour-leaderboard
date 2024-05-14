@@ -13,8 +13,22 @@ import { LeaderboardResults, Tournament } from "@/lib/types";
 import { getLeaderboardData, getTournaments } from "@/db/queries";
 import toast from "react-hot-toast";
 import { formatOrdinals } from "@/lib/utils";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
-export default function StandingsTable() {
+type Props = {
+  selected: string;
+}
+
+function filterBySelected(data: LeaderboardResults[], value: string) {
+  if (value === "Overall") {
+    return data
+  } else {
+    return data.filter((item) => item.division === value)
+  }
+}
+
+export default function StandingsTable({ selected }: Props) {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [results, setResults] = useState<LeaderboardResults[]>([]);
 
@@ -41,7 +55,8 @@ export default function StandingsTable() {
       try {
         const resultsData = await getLeaderboardData();
         if (resultsData) {
-          setResults(resultsData);
+          const resultsToDisplay = filterBySelected(resultsData, selected)
+          setResults(resultsToDisplay);
         } else {
           toast.error("Failed to fetch results.");
         }
@@ -52,36 +67,63 @@ export default function StandingsTable() {
     };
 
     fetchResults();
-  }, []);
+  }, [selected]);
 
   return (
-      <div className="h-screen relative overflow-auto shadow-lg ">
-      <Table className="bg-white">
-        <TableHeader className="sticky top-0 bg-white ">
-          <TableRow className="text-[11px] leading-3 uppercase h-16 ">
-            <TableHead className="text-center font-bold">Pos</TableHead>
-            <TableHead className="w-fit font-bold">Player</TableHead>
-            <TableHead className="w-fit text-center font-bold">Division</TableHead>
-            <TableHead className="text-center font-bold">Points</TableHead>
-            <TableHead className="text-center font-bold">Events</TableHead>
+    <div className="h-fit relative overflow-auto shadow-lg">
+      <Table className="bg-white ">
+        <TableHeader className="sticky top-0 bg-sky-900 ">
+          <TableRow className="text-[11px] leading-3 uppercase h-16 hover:bg-inherit">
+            <TableHead className="text-center font-bold text-sky-50">
+              Pos
+            </TableHead>
+            <TableHead className="font-bold text-sky-50">
+              Player
+            </TableHead>
+            <TableHead className="w-fit text-center font-bold text-sky-50">
+              Division
+            </TableHead>
+            <TableHead className="text-center font-bold text-sky-50">
+              Points
+            </TableHead>
+            <TableHead className="text-center font-bold collapse-md text-sky-50">
+              Events Played
+            </TableHead>
             {tournaments.map((tournament) => (
-              <TableHead key={tournament.id} className="text-center w-28 font-bold invisible md:visible">
-                <div>{tournament.tournament_name}</div>
+              <TableHead
+                key={tournament.id}
+                className="font-bold text-center collapse-md text-sky-50 w-32 relative"
+              >
+                  <div className="collapse-md">
+                    {tournament.tournament_name}
+                  </div>
+                  {tournament.isMajor && (
+                    <div className="absolute top-0 right-0 bg-red-500 text-white px-1 py-[1px] rounded-bl-md">
+                      <p className="self-center capitalize text-[10px]">major</p>
+                    </div>
+                  )}
               </TableHead>
             ))}
-            </TableRow>
+          </TableRow>
         </TableHeader>
 
         <TableBody>
           {results.map((result, index) => (
-            <TableRow key={result.player_id}>
+            <TableRow key={result.player_id} className="h-12">
               <TableCell className="text-center">{result.rank}</TableCell>
-              <TableCell className="w-fit">{result.name}</TableCell>
-              <TableCell className="text-center">{result.player_results[0].division}</TableCell>
-              <TableCell className="text-center">
+              <TableCell className="">
+                <Link
+                  href={`https://www.pdga.com/player/${result.pdga_num}`}
+                  target="_blank"
+                >
+                  {result.name}
+                </Link>
+              </TableCell>
+              <TableCell className="text-center">{result.division}</TableCell>
+              <TableCell className="text-center font-medium">
                 {result.total_tour_points}
               </TableCell>
-              <TableCell className="text-center">
+              <TableCell className="text-center collapse-md">
                 {result.events_played}
               </TableCell>
               {tournaments.map((tournament) => {
@@ -93,8 +135,8 @@ export default function StandingsTable() {
                     key={tournament.id}
                     className={
                       playerResult && !playerResult?.is_counted
-                        ? "bg-sky-50/75 invisible md:visible"
-                        : "invisible md:visible"
+                        ? "bg-sky-50/75 collapse-md"
+                        : "collapse-md"
                     }
                   >
                     {playerResult ? (
@@ -128,6 +170,6 @@ export default function StandingsTable() {
           ))}
         </TableBody>
       </Table>
-      </div>
+    </div>
   );
 }
