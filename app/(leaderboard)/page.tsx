@@ -47,7 +47,7 @@ export default function Standings() {
           priority
         />
         <div className=" absolute bottom-3 left-0 my-4 ml-6 flex flex-col gap-3 w-fit">
-          <h2 className="font-medium text-4xl text-white">Standings</h2>
+          <h2 className="font-medium text-4xl text-white">Leaderboard</h2>
           <div>
             <select className="px-3 py-1" onChange={(e) => handleSelect(e)}>
               <option value="Overall">Overall</option>

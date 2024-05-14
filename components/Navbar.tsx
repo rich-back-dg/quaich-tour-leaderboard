@@ -23,7 +23,7 @@ export default function Navbar({ user }: Props) {
             className="ring-1 ring-sky-100 rounded-full"
           />
           <div className="flex">
-            <NavLink href="/" title="Standings" />
+            <NavLink href="/" title="Leaderboard" />
             <NavLink href="/results" title="Results" />
           </div>
         </div>
