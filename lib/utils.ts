@@ -1,13 +1,13 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Division } from "./types"
+import { Division, DivisionRanking } from "./types"
 import { CSVRow } from "./csvToJson"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const divisionRankings: Division[] = [
+export const divisionRankings: DivisionRanking[] = [
   {name: 'MPO', rank: 1},
   {name: 'MP40', rank: 2},
   {name: 'MP50', rank: 3},
@@ -79,6 +79,16 @@ export const sortDivisionsByRanking = (a: string, b: string): number => {
   // Find the ranks of the first division in each group
   const rankA = divisionRankings.find((division) => division.name === a)?.rank || 0;
   const rankB = divisionRankings.find((division) => division.name === b)?.rank || 0;
+
+  // Compare ranks and return the result
+  return rankA - rankB;
+};
+
+// Custom sorting function based on division rankings
+export const divisionsSortedByRank = (a: Division, b: Division): number => {
+  // Find the ranks of the first division in each group
+  const rankA = divisionRankings.find((division) => division.name === a.division)?.rank || 0;
+  const rankB = divisionRankings.find((division) => division.name === b.division)?.rank || 0;
 
   // Compare ranks and return the result
   return rankA - rankB;

@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "../utils/supabase/server";
-import { Course, LeaderboardResults, Tournament } from "@/lib/types";
+import { Course, Division, LeaderboardResults, Player, Tournament } from "@/lib/types";
 import { Layout } from "@/lib/types";
 
 const supabase = createClient();
@@ -58,6 +58,23 @@ export async function getTournaments(): Promise<Tournament[] | null> {
   }
 }
 
+export async function getPlayers(): Promise<Player[] | null> {
+  try {
+    const { data: players_data, error } = await supabase
+      .from("players")
+      .select()
+      .order("first_name", { ascending: true });
+
+    if (error) {
+      throw new Error(`Could not fetch Players data: ${error.message}`);
+    }
+    return players_data || null;
+  } catch (error) {
+    console.error("Error fetching Players List: ", error);
+    return null;
+  }
+}
+
 export async function getLeaderboardData(): Promise<LeaderboardResults[] | null> {
 
   try {
@@ -73,6 +90,25 @@ export async function getLeaderboardData(): Promise<LeaderboardResults[] | null>
     
   } catch (error) {
     console.error("Error fetching Leaderboard Data: ", error)
+    return null;
+  }
+}
+
+export async function getDivisionsList(): Promise<Division[] | null> {
+
+  try {
+    const { data: divisions, error } = await supabase
+      .from("divisions_list")
+      .select();
+  
+    if (error) {
+      console.error("Could not fetch divisions list: ", error.message);
+    }
+  
+    return divisions ?? [];
+    
+  } catch (error) {
+    console.error("Error fetching divisions list: ", error)
     return null;
   }
 }

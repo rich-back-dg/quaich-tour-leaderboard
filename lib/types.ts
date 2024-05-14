@@ -17,7 +17,7 @@ export type Layout = {
   course_id: number;
 }
 
-export type Division = {
+export type DivisionRanking = {
   name: string;
   rank: number;
 }
@@ -43,6 +43,7 @@ export const LayoutSchema = z.object({
 
 export const CourseSchema = z.object({
   course_name: z.string(),
+  course_id: z.string()
 });
 
 export const uploadFormSchema = z.object({
@@ -106,6 +107,11 @@ export type LeaderboardResults = {
   player_results: PlayerResult[];
   rank: number;
   name: string;
+  first_name: string;
+  last_name: string;
+  pdga_num: string;
+  id: string;
+  division: string;
 }
 
 export type Tournament = {
@@ -128,4 +134,16 @@ export type PlayerResult = {
     tournament_id: string,
     overall_placing: number,
     division_placing: string,
+}
+
+export type Division = {
+  division: string;
+}
+
+export type Player = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  pdga_num: string;
+  division: string;
 }
