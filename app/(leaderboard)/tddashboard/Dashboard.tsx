@@ -5,13 +5,15 @@ import { TableIcon, Users, Calendar, Menu } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { columns } from "./columns";
 import TournamentsList from "./_tournaments/TournamentsList";
-import UploadResultsForm from "../td/upload/UploadResultsForm";
+import UploadResultsForm from "./_upload/UploadResultsForm";
 import { PlayersDataTable } from "./PlayersDataTable";
 import { getPlayers } from "@/db/queries";
 import { Player } from "@/lib/types";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import CourseList from "./_courses/CourseList";
+import AddCourseForm from "./_courses/AddCourseForm";
 
 export default function Dashboard() {
   const [idSelected, setIdSelected] = useState("upload");
@@ -66,6 +68,14 @@ export default function Dashboard() {
               >
                 <Calendar className="h-4 w-4" />
                 Tournaments
+              </Link>
+              <Link
+                href="#"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 hover:font-semibold hover:bg-zinc-200/50"
+                onClick={() => setIdSelected("courses")}
+              >
+                <Calendar className="h-4 w-4" />
+                Courses
               </Link>
             </nav>
           </div>
@@ -154,6 +164,23 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center justify-center ">
             <PlayersDataTable data={players} columns={columns} />
+          </div>
+        </main>
+
+        <main
+          id="players"
+          className={
+            idSelected === "courses"
+              ? "flex flex-1 flex-col gap-4 p-6 bg-white"
+              : "hidden"
+          }
+        >
+          <div className="flex items-center">
+            <h1 className="text-lg font-semibold md:text-2xl">Course List</h1>
+          </div>
+          <div className="flex gap-20 items-center justify-evenly border rounded-md py-4">
+            <CourseList />
+            <AddCourseForm />
           </div>
         </main>
       </div>
