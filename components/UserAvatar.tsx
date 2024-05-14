@@ -25,9 +25,9 @@ export default async function UserAvatar() {
   }
 
   return (
-    <Avatar>
-      <AvatarImage src={avatar.publicUrl} alt="User Avatar Image"/>
-      <AvatarFallback>{createAvatarFallback()}</AvatarFallback>
-    </Avatar>
+      <Avatar>
+        <AvatarImage src={avatar.publicUrl} alt="User Avatar Image" />
+        <AvatarFallback>{createAvatarFallback()}</AvatarFallback>
+      </Avatar>
   );
 }
