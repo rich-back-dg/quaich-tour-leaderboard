@@ -30,19 +30,20 @@ export default function LoginPage({
       return redirect("/login?message=Could not authenticate user");
     }
 
-    return redirect("/");
+    return redirect("/tddashboard");
   };
 
   return (
-    <div className="p-16 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-yellow-200/40 to-yellow-500/30 min-h-screen flex">
-      <div className="w-full lg:grid lg:min-h-[500px] lg:grid-cols-2 xl:min-h-[700px] rounded-xl shadow-xl bg-zinc-50 ">
+    <div className="p-16 min-h-screen flex">
+      <div className="w-full lg:grid lg:min-h-[500px] lg:grid-cols-2 xl:min-h-[700px] rounded-xl shadow-xl border">
         <div className="hidden lg:block ">
           <Image
             src="/farewell-fanmore.jpeg"
-            alt="Image"
+            alt="Fanmore Isle of Mull"
             width="1920"
             height="1080"
             className="h-full w-full object-[75%] object-cover dark:brightness-[0.2] dark:grayscale saturate-150 shadow-lg rounded-tl-xl rounded-bl-xl"
+            priority
           />
         </div>
 
@@ -95,10 +96,10 @@ export default function LoginPage({
                 </Alert>
               )}
             </form>
-            <div className="mt-4 text-center text-sm">
+            {/* <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?
             </div>
-            <SignupDialog />
+            <SignupDialog /> */}
           </div>
         </div>
       </div>
