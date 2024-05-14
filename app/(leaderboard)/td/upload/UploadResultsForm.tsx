@@ -88,6 +88,7 @@ export default function UploadResultsForm() {
     fetchResultsInfo();
   }, [switchState]);
 
+
   const getNumRoundsFromFile = (data: CSVRow[]) => {
     let keys: string[] = [];
     data.map((element) => {
@@ -172,10 +173,20 @@ export default function UploadResultsForm() {
 
   // Helper function to filter out any DNFs
   function filterOutDNFs(data: CSVRow[]): CSVRow[] {
-    const dataToFilter: CSVRow[] = [...data];
-    const filteredData: CSVRow[] = dataToFilter.filter(
-      (row) => row.Total !== "999" && row.Total !== "888"
-    );
+    const dnfPlayers: CSVRow[] = [];
+
+    data.forEach((row) => {
+      const keys = Object.keys(row);
+      const hasIncompleteRound = keys.some(
+        (key) => key.startsWith("Rd") && row[key] === ""
+      );
+      const isDNF = row.Total === "999" || row.Total === "888";
+      if (hasIncompleteRound || isDNF) {
+        dnfPlayers.push(row);
+      }
+    });
+
+    const filteredData = data.filter((player) => !dnfPlayers.includes(player));
     return filteredData;
   }
 
@@ -255,16 +266,19 @@ export default function UploadResultsForm() {
     }));
   }
 
-  function processFileData(data: CSVRow[], isMultipleLayouts: boolean, isMajor: boolean) {
+  function processFileData(
+    data: CSVRow[],
+    isMultipleLayouts: boolean,
+    isMajor: boolean
+  ) {
     // Filter out DNFs
     const dataWithDNFsFiltered = filterOutDNFs(data);
 
-    // Check PDGA Numbers and populate any empty occurences
+    // Check PDGA Numbers and populate any empty occurrences
     const dataWithPDGANumsChecked = handleEmptyPDGANum(dataWithDNFsFiltered);
 
-    let dataWithOverallPlacings: CSVRow[] | undefined;
-
     // Check if divisions didn't all play the same layout and Calculate placings accordingly
+    let dataWithOverallPlacings: CSVRow[] = [];
     if (isMultipleLayouts) {
       // Establish Division groupings based on layoutPerDivision
       const divisionGroupings = groupDivisionsByLayouts(layoutsPerDivision);
@@ -282,11 +296,24 @@ export default function UploadResultsForm() {
       );
     }
 
-    // Calculate tour points and return
-    const dataWithTourPoints = calculateTourPoints(dataWithOverallPlacings, isMajor);
+    // Sort DNFs to be last in placings
+    const dnfPlayers = data.filter(
+      (player) => !dataWithDNFsFiltered.includes(player)
+    );
+    const lastPlacing = dataWithOverallPlacings.length + 1;
+    dnfPlayers.forEach((player) => {
+      player.overall_placing = lastPlacing;
+    });
+    dataWithOverallPlacings.push(...dnfPlayers);
+
+    // Calculate tour points
+    const dataWithTourPoints = calculateTourPoints(
+      dataWithOverallPlacings,
+      isMajor
+    );
+
     return dataWithTourPoints;
   }
-
 
   const uploadFormClientAction = async (formData: FormData) => {
     const tournamentName = formData.get("tournamentName") as string;
@@ -294,9 +321,13 @@ export default function UploadResultsForm() {
     const isMultipleLayouts =
       formData.get("isMultipleLayouts") === null ? false : true;
 
-    console.log(isMajor)
+    const fileDataToUpload = processFileData(
+      fileData,
+      isMultipleLayouts,
+      isMajor
+    );
 
-    const fileDataToUpload = processFileData(fileData, isMultipleLayouts, isMajor);
+    console.table(fileDataToUpload);
 
     const newUpload = {
       fileData: fileDataToUpload,
@@ -374,11 +405,7 @@ export default function UploadResultsForm() {
 
               <div className="flex gap-3 items-center ">
                 <Label htmlFor="isMajor">Is it a Major?: </Label>
-                <Input
-                  type="checkbox"
-                  name="isMajor"
-                  className="w-4"
-                />
+                <Input type="checkbox" name="isMajor" className="w-4" />
               </div>
 
               <div className="flex items-center space-x-4">
