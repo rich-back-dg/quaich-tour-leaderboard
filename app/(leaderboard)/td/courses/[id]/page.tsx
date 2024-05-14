@@ -2,15 +2,17 @@ import { createClient } from "@/utils/supabase/server";
 import React from "react";
 import AddLayoutForm from "../AddLayoutForm";
 import UpdateCourseForm from "../UpdateCourseForm";
+import { redirect } from "next/navigation";
 
 export const dynamicParams = true;
+
+const supabase = createClient();
 
 type Props = {
   params: { id: string };
 };
 
 export async function generateMetadata({ params }: Props) {
-  const supabase = createClient();
 
   const { data: course } = await supabase
     .from("courses")
@@ -24,7 +26,6 @@ export async function generateMetadata({ params }: Props) {
 }
 
 async function getCourse(id: string) {
-  const supabase = createClient();
 
   const { data } = await supabase
     .from("courses")
@@ -36,6 +37,26 @@ async function getCourse(id: string) {
 }
 
 export default async function CourseDetails({ params }: Props) {
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Retrieve the user's profile
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user?.id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching user profile:", error.message);
+    return redirect("/login");
+  }
+
+  if (!profile || profile.role !== "td") {
+    return redirect("/");
+  }
   const course = await getCourse(params.id);
 
   return (
