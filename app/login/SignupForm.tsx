@@ -99,7 +99,7 @@ export default function SignupForm({ signupType, searchParams }: Props) {
             <div className="flex items-center">
               <Label htmlFor="signup_code">Special Code</Label>
             </div>
-            <InputOTP maxLength={6} name="signup_code" required>
+            <InputOTP maxLength={5} name="signup_code" required>
               <InputOTPGroup className="bg-white">
                 <InputOTPSlot index={0} />
                 <InputOTPSlot index={1} />
