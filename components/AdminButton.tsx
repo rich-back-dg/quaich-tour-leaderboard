@@ -25,7 +25,7 @@ export default async function AdminButton() {
   return (
     profile && (
       <Link
-        href={profile.role === "td" ? "/td" : "/protected"}
+        href={profile.role === "td" ? "/tddashboard" : "/player"}
         rel="noreferrer"
       >
         <Button>Admin</Button>
