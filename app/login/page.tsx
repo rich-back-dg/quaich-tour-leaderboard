@@ -34,9 +34,9 @@ export default function LoginPage({
   };
 
   return (
-    <div className="p-16 min-h-screen flex">
-      <div className="w-full lg:grid lg:min-h-[500px] lg:grid-cols-2 xl:min-h-[700px] rounded-xl shadow-xl border">
-        <div className="hidden lg:block ">
+    <div className="h-screen w-full flex items-center justify-center bg-sky-50 p-6 md:p-12">
+      <div className="w-fit md:w-full min-h-fit md:grid md:min-h-full md:grid-cols-2 rounded-xl shadow-xl border bg-zinc-50">
+        <div className="hidden md:block ">
           <Image
             src="/farewell-fanmore.jpeg"
             alt="Fanmore Isle of Mull"
@@ -47,11 +47,11 @@ export default function LoginPage({
           />
         </div>
 
-        <div className="flex items-center justify-center py-12 animate-in">
-          <div className="mx-auto grid w-[350px] gap-6">
+        <div className="flex items-center justify-center px-8 py-12 animate-in">
+          <div className="mx-auto grid w-full gap-6">
             <div className="grid gap-2 text-center">
               <h1 className="text-3xl font-bold">Login</h1>
-              <p className="text-balance text-muted-foreground">
+              <p className="text-balance">
                 Enter your email below to login to your account
               </p>
             </div>
@@ -72,12 +72,12 @@ export default function LoginPage({
 
                   {/* TODO: Add password reset functionality */}
 
-                  <Link
+                  {/* <Link
                     href="/forgot-password"
                     className="ml-auto inline-block text-sm underline"
                   >
                     Forgot your password?
-                  </Link>
+                  </Link> */}
                 </div>
                 <Input id="password" type="password" name="password" required />
               </div>
