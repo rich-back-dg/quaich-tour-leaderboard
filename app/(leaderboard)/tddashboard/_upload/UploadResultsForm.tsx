@@ -197,6 +197,9 @@ export default function UploadResultsForm() {
       if (player.PDGANum === "") {
         const nameToAdd = "@" + player.FirstName + player.LastName;
         player.PDGANum = nameToAdd;
+        player.hasNoPDGANum = true
+      } else {
+        player.hasNoPDGANum = false
       }
     });
     return dataToCheck;

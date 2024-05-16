@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { uploadFormSchema } from "@/lib/types";
+import { Player, uploadFormSchema } from "@/lib/types";
 
 const supabase = createClient();
 
@@ -17,6 +17,13 @@ interface PlayerData {
   Place: string;
   overall_placing: number;
   event_points: number;
+  hasNoPDGANum: boolean;
+}
+
+interface PlayerUpdate {
+  id: number;
+  pdga_num: string;
+  has_no_pdga_num: boolean;
 }
 
 // Function to insert all data
@@ -44,22 +51,52 @@ async function insertData(jsonData: PlayerData[], formData: any) {
   }
 
   // Fetch all existing players from the database
+
   const { data: existingPlayers, error: existingPlayersError } = await supabase
     .from("players")
-    .select()
-    .in(
-      "pdga_num",
-      jsonData.map((row) => row.PDGANum)
+    .select();
+
+  if (existingPlayersError) {
+    console.error(existingPlayersError);
+    return;
+  }
+
+  const newPlayers: PlayerData[] = [];
+  const updatePlayers: PlayerUpdate[] = [];
+
+  // Step 1: Check for existing players where pdga_num matches
+  jsonData.forEach((player) => {
+    const existingPlayer = existingPlayers.find(
+      (existingPlayer: Player) => existingPlayer.pdga_num === player.PDGANum
     );
 
-  const newPlayers = jsonData.filter(
-    (row) =>
-      !existingPlayers?.some(
-        (existingPlayer) => existingPlayer.pdga_num === row.PDGANum
-      )
-  );
+    if (existingPlayer) {
+      // Player already exists with this PDGA number
+      return;
+    }
 
-  // Insert new players into the database
+    // Step 2: Check for existing players where firstName and lastName match and has_no_pdga_num is true
+    const potentialMatch = existingPlayers.find(
+      (existingPlayer: Player) =>
+        existingPlayer.first_name === player.FirstName &&
+        existingPlayer.last_name === player.LastName &&
+        existingPlayer.has_no_pdga_num
+    );
+
+    if (potentialMatch) {
+      // Update existing player with new PDGA number
+      updatePlayers.push({
+        id: potentialMatch.id!,
+        pdga_num: player.PDGANum,
+        has_no_pdga_num: false,
+      });
+    } else {
+      // New player
+      newPlayers.push(player);
+    }
+  });
+
+  // Insert new players
   const { data: newPlayerData, error: newPlayerError } = await supabase
     .from("players")
     .upsert(
@@ -68,12 +105,33 @@ async function insertData(jsonData: PlayerData[], formData: any) {
         last_name: row.LastName,
         pdga_num: row.PDGANum,
         division: row.Division,
+        has_no_pdga_num: row.hasNoPDGANum,
       }))
     )
     .select();
 
-  // Combine existingPlayers and newPlayerData for further processing if needed
-  const allPlayerData = existingPlayers?.concat(newPlayerData);
+  if (newPlayerError) {
+    console.error(newPlayerError);
+  }
+
+  // Update existing players with new PDGA numbers
+  for (const player of updatePlayers) {
+    const { error: updatePlayerError } = await supabase
+      .from("players")
+      .update({
+        pdga_num: player.pdga_num,
+        has_no_pdga_num: player.has_no_pdga_num,
+      })
+      .eq("id", player.id);
+
+    if (updatePlayerError) {
+      console.error(updatePlayerError);
+    }
+  }
+
+  // Merge all player data (existing, new, and updated)
+  const allPlayerData = existingPlayers.concat(newPlayerData || []).concat(updatePlayers);
+
 
   // Upsert Results for each player
   for (let i = 0; i < jsonData.length; i++) {

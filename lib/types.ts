@@ -54,6 +54,7 @@ export const uploadFormSchema = z.object({
       Hole: z.string(),
       LastName: z.string(),
       PDGANum: z.string(),
+      hasNoPDGANum: z.boolean(),
       Phone: z.string(),
       Place: z.string(),
       Prize: z.string(),
@@ -146,4 +147,5 @@ export type Player = {
   last_name: string;
   pdga_num: string;
   division: string;
+  has_no_pdga_num: boolean;
 }
