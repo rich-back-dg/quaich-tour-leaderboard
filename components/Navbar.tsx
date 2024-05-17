@@ -30,7 +30,7 @@ export default function Navbar({ user }: Props) {
         <div className="flex justify-between items-center p-3 gap-3">
           <AuthButton />
           {user && <AdminButton />}
-          {/* <ModeToggle /> */}
+          <ModeToggle />
           {user && <UserAvatar />}
         </div>
       </div>

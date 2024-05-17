@@ -35,7 +35,7 @@ export default function RootLayout({
         >
           <main className="min-h-screen flex flex-col items-center">
             {children}
-            <footer className="w-full border-t p-6 flex justify-center text-center text-xs text-zinc-500">
+            <footer className="w-full border-t dark:border-t-zinc-600 p-6 flex justify-center text-center text-xs text-zinc-500">
               <div className="flex gap-1 items-center">
                 <p>built by <u>richard backhouse</u>.</p>
               </div>

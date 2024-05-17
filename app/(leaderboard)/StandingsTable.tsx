@@ -71,28 +71,28 @@ export default function StandingsTable({ selected }: Props) {
 
   return (
     <div className="h-fit relative overflow-auto shadow-lg">
-      <Table className="bg-white ">
+      <Table className="bg-white dark:bg-zinc-800/50">
         <TableHeader className="sticky top-0 bg-sky-900 ">
           <TableRow className="text-[11px] leading-3 uppercase h-16 hover:bg-inherit">
-            <TableHead className="text-center font-bold text-sky-50">
+            <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100">
               Pos
             </TableHead>
-            <TableHead className="font-bold text-sky-50">
+            <TableHead className="font-bold text-sky-50 dark:text-sky-100">
               Player
             </TableHead>
-            <TableHead className="w-fit text-center font-bold text-sky-50">
+            <TableHead className="w-fit text-center font-bold text-sky-50 dark:text-sky-100">
               Division
             </TableHead>
-            <TableHead className="text-center font-bold text-sky-50">
+            <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100">
               Points
             </TableHead>
-            <TableHead className="text-center font-bold collapse-md text-sky-50">
+            <TableHead className="text-center font-bold collapse-md text-sky-50 dark:text-sky-100">
               Events Played
             </TableHead>
             {tournaments.map((tournament) => (
               <TableHead
                 key={tournament.id}
-                className="font-bold text-center collapse-md text-sky-50 w-32 relative"
+                className="font-bold text-center collapse-md text-sky-50 dark:text-sky-100 w-32 relative"
               >
                   <div className="collapse-md">
                     {tournament.tournament_name}
@@ -109,7 +109,7 @@ export default function StandingsTable({ selected }: Props) {
 
         <TableBody>
           {results.map((result, index) => (
-            <TableRow key={result.player_id} className="h-12">
+            <TableRow key={result.player_id} className="h-12 dark:border-b dark:border-b-zinc-600">
               <TableCell className="text-center">{result.rank}</TableCell>
               <TableCell className="">
                 <Link
