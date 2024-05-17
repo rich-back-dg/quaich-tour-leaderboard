@@ -41,6 +41,7 @@ export default function UploadResultsForm() {
   const [selectedCourseID, setSelectedCourseID] = useState("");
   const [date, setDate] = useState<DateRange | undefined>();
   const [switchState, setSwitchState] = useState<boolean>(false);
+  const [switchStateJuniors, setSwitchStateJuniors] = useState<boolean>(false);
   const [divisionsList, setDivisionsList] = useState<string[]>([]);
   const [numberOfRounds, setNumberOfRounds] = useState<number>(0);
   const [layoutsPerDivision, setLayoutsPerDivision] = useState<EventRounds[]>(
@@ -88,7 +89,6 @@ export default function UploadResultsForm() {
     fetchResultsInfo();
   }, [switchState]);
 
-
   const getNumRoundsFromFile = (data: CSVRow[]) => {
     let keys: string[] = [];
     data.map((element) => {
@@ -130,6 +130,10 @@ export default function UploadResultsForm() {
 
   const handleSwitchSelect = async (e: boolean) => {
     setSwitchState(e);
+  };
+
+  const handleJuniorsSwitchSelect = async (e: boolean) => {
+    setSwitchStateJuniors(e);
   };
 
   const handleAccordionState = (): string => {
@@ -197,9 +201,9 @@ export default function UploadResultsForm() {
       if (player.PDGANum === "") {
         const nameToAdd = "@" + player.FirstName + player.LastName;
         player.PDGANum = nameToAdd;
-        player.hasNoPDGANum = true
+        player.hasNoPDGANum = true;
       } else {
-        player.hasNoPDGANum = false
+        player.hasNoPDGANum = false;
       }
     });
     return dataToCheck;
@@ -274,11 +278,11 @@ export default function UploadResultsForm() {
     isMultipleLayouts: boolean,
     isMajor: boolean
   ) {
-    // Filter out DNFs
-    const dataWithDNFsFiltered = filterOutDNFs(data);
-
     // Check PDGA Numbers and populate any empty occurrences
-    const dataWithPDGANumsChecked = handleEmptyPDGANum(dataWithDNFsFiltered);
+    const dataWithPDGANumsChecked = handleEmptyPDGANum(data);
+
+    // Filter out DNFs
+    const dataWithDNFsFiltered = filterOutDNFs(dataWithPDGANumsChecked);
 
     // Check if divisions didn't all play the same layout and Calculate placings accordingly
     let dataWithOverallPlacings: CSVRow[] = [];
@@ -287,7 +291,7 @@ export default function UploadResultsForm() {
       const divisionGroupings = groupDivisionsByLayouts(layoutsPerDivision);
       // Group the fileData rows by the established groupings
       const resultsDataGroupings = groupResultsByDivision(
-        dataWithPDGANumsChecked,
+        dataWithDNFsFiltered,
         divisionGroupings
       );
       // Populate the overall placings from the resultsDataGroupings
@@ -295,19 +299,54 @@ export default function UploadResultsForm() {
     } else {
       // We only need to run the simplified single layout placings calculation
       dataWithOverallPlacings = calculateOverallPlacingForSingleLayout(
-        dataWithPDGANumsChecked
+        dataWithDNFsFiltered
       );
     }
 
-    // Sort DNFs to be last in placings
-    const dnfPlayers = data.filter(
-      (player) => !dataWithDNFsFiltered.includes(player)
-    );
-    const lastPlacing = dataWithOverallPlacings.length + 1;
-    dnfPlayers.forEach((player) => {
-      player.overall_placing = lastPlacing;
-    });
-    dataWithOverallPlacings.push(...dnfPlayers);
+    if (switchStateJuniors) {
+      // Account for Juniors playing less rounds thus placed above any DNFs
+      const dnfPlayers = data.filter(
+        (player) =>
+          !dataWithDNFsFiltered.includes(player) &&
+          !player.Division.includes("J")
+      );
+
+      const juniorPlayersWithMissingRound = data.filter(
+        (player) =>
+          !dataWithDNFsFiltered.includes(player) &&
+          player.Division.includes("J")
+      );
+
+      let lastPlacing = dataWithOverallPlacings.length + 1;
+
+      juniorPlayersWithMissingRound.forEach((player) => {
+        player.overall_placing = lastPlacing;
+        lastPlacing++;
+      });
+
+      dataWithOverallPlacings.push(...juniorPlayersWithMissingRound);
+
+      let updatedLastPlacing = dataWithOverallPlacings.length + 1;
+
+      dnfPlayers.forEach((player) => {
+        player.overall_placing = updatedLastPlacing;
+      });
+
+      dataWithOverallPlacings.push(...dnfPlayers);
+    } else {
+      // Sort DNFs to be last in placings
+      const dnfPlayers = data.filter(
+        (player) => !dataWithDNFsFiltered.includes(player)
+      );
+
+      let lastPlacing = dataWithOverallPlacings.length + 1;
+
+      dnfPlayers.forEach((player) => {
+        player.overall_placing = lastPlacing;
+      });
+
+      dataWithOverallPlacings.push(...dnfPlayers);
+    }
 
     // Calculate tour points
     const dataWithTourPoints = calculateTourPoints(
@@ -430,6 +469,33 @@ export default function UploadResultsForm() {
                     className={!switchState ? "text-gray-300" : "font-semibold"}
                   >
                     No
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <Label htmlFor="juniorsLessRounds">
+                  Did Junior Divisions play less rounds?
+                </Label>
+                <div className="flex gap-2 items-center">
+                  <p
+                    className={
+                      switchStateJuniors ? "text-gray-300" : "font-semibold"
+                    }
+                  >
+                    No
+                  </p>
+                  <Switch
+                    name="juniorsLessRounds"
+                    disabled={resultsFile ? false : true}
+                    onCheckedChange={(e) => handleJuniorsSwitchSelect(e)}
+                  />
+                  <p
+                    className={
+                      !switchStateJuniors ? "text-gray-300" : "font-semibold"
+                    }
+                  >
+                    Yes
                   </p>
                 </div>
               </div>

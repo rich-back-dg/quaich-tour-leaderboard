@@ -21,7 +21,7 @@ interface PlayerData {
 }
 
 interface PlayerUpdate {
-  id: number;
+  id: string;
   pdga_num: string;
   has_no_pdga_num: boolean;
 }
@@ -48,10 +48,10 @@ async function insertData(jsonData: PlayerData[], formData: any) {
     tournamentID = tournamentData.id;
   } else {
     console.error(tournamentError);
+    return;
   }
 
   // Fetch all existing players from the database
-
   const { data: existingPlayers, error: existingPlayersError } = await supabase
     .from("players")
     .select();
@@ -63,84 +63,138 @@ async function insertData(jsonData: PlayerData[], formData: any) {
 
   const newPlayers: PlayerData[] = [];
   const updatePlayers: PlayerUpdate[] = [];
+  let allPlayerData: any[] = existingPlayers || [];
 
-  // Step 1: Check for existing players where pdga_num matches
-  jsonData.forEach((player) => {
-    const existingPlayer = existingPlayers.find(
-      (existingPlayer: Player) => existingPlayer.pdga_num === player.PDGANum
-    );
+  if (existingPlayers && existingPlayers.length > 0) {
+    console.log("IF STATEMENT RAN");
 
-    if (existingPlayer) {
-      // Player already exists with this PDGA number
+    // Step 1: Check for existing players where pdga_num matches
+    jsonData.forEach((player) => {
+      const existingPlayer = existingPlayers.find(
+        (existingPlayer: Player) => existingPlayer.pdga_num === player.PDGANum
+      );
+
+      if (existingPlayer) {
+        // Player already exists with this PDGA number
+        return;
+      }
+
+      // Step 2: Check for existing players where firstName and lastName match and has_no_pdga_num is true
+      const potentialMatch = existingPlayers.find(
+        (existingPlayer: Player) =>
+          existingPlayer.first_name === player.FirstName &&
+          existingPlayer.last_name === player.LastName &&
+          existingPlayer.has_no_pdga_num
+      );
+
+      if (potentialMatch) {
+        // Update existing player with new PDGA number
+        updatePlayers.push({
+          id: potentialMatch.id!,
+          pdga_num: player.PDGANum,
+          has_no_pdga_num: false,
+        });
+      } else {
+        // New player
+        newPlayers.push(player);
+      }
+    });
+
+    // Insert new players
+    const { data: newPlayerData, error: newPlayerError } = await supabase
+      .from("players")
+      .upsert(
+        newPlayers.map((row) => ({
+          first_name: row.FirstName,
+          last_name: row.LastName,
+          pdga_num: row.PDGANum,
+          division: row.Division,
+          has_no_pdga_num: row.hasNoPDGANum,
+        })),
+      )
+      .select();
+
+    if (newPlayerError) {
+      console.error(newPlayerError);
+    }
+
+    // Merge new player data if any
+    if (newPlayerData) {
+      allPlayerData = allPlayerData.concat(newPlayerData);
+    }
+
+    // Update existing players with new PDGA numbers
+    for (const player of updatePlayers) {
+      const { error: updatePlayerError } = await supabase
+        .from("players")
+        .update({
+          pdga_num: player.pdga_num,
+          has_no_pdga_num: player.has_no_pdga_num,
+        })
+        .eq("id", player.id);
+
+      if (updatePlayerError) {
+        console.error(updatePlayerError);
+      }
+    }
+
+    // Fetch updated players to ensure accurate allPlayerData
+    const updatedPlayerIDs = updatePlayers.map(player => player.id);
+    const { data: updatedPlayers, error: updatedPlayersError } = await supabase
+      .from("players")
+      .select()
+      .in("id", updatedPlayerIDs);
+
+    if (updatedPlayersError) {
+      console.error(updatedPlayersError);
+    }
+
+    if (updatedPlayers) {
+      allPlayerData = allPlayerData.concat(updatedPlayers);
+    }
+
+  } else {
+    console.log("ELSE STATEMENT RAN");
+    // Insert all players
+    const { data: playerData, error: playerError } = await supabase
+      .from("players")
+      .insert(
+        jsonData.map((row) => ({
+          first_name: row.FirstName,
+          last_name: row.LastName,
+          pdga_num: row.PDGANum,
+          division: row.Division,
+          has_no_pdga_num: row.hasNoPDGANum,
+        }))
+      )
+      .select();
+
+    console.log(playerData);
+
+    if (playerError) {
+      console.error(playerError);
       return;
     }
 
-    // Step 2: Check for existing players where firstName and lastName match and has_no_pdga_num is true
-    const potentialMatch = existingPlayers.find(
-      (existingPlayer: Player) =>
-        existingPlayer.first_name === player.FirstName &&
-        existingPlayer.last_name === player.LastName &&
-        existingPlayer.has_no_pdga_num
-    );
-
-    if (potentialMatch) {
-      // Update existing player with new PDGA number
-      updatePlayers.push({
-        id: potentialMatch.id!,
-        pdga_num: player.PDGANum,
-        has_no_pdga_num: false,
-      });
-    } else {
-      // New player
-      newPlayers.push(player);
-    }
-  });
-
-  // Insert new players
-  const { data: newPlayerData, error: newPlayerError } = await supabase
-    .from("players")
-    .upsert(
-      newPlayers.map((row) => ({
-        first_name: row.FirstName,
-        last_name: row.LastName,
-        pdga_num: row.PDGANum,
-        division: row.Division,
-        has_no_pdga_num: row.hasNoPDGANum,
-      }))
-    )
-    .select();
-
-  if (newPlayerError) {
-    console.error(newPlayerError);
-  }
-
-  // Update existing players with new PDGA numbers
-  for (const player of updatePlayers) {
-    const { error: updatePlayerError } = await supabase
-      .from("players")
-      .update({
-        pdga_num: player.pdga_num,
-        has_no_pdga_num: player.has_no_pdga_num,
-      })
-      .eq("id", player.id);
-
-    if (updatePlayerError) {
-      console.error(updatePlayerError);
+    if (playerData) {
+      allPlayerData = playerData;
     }
   }
-
-  // Merge all player data (existing, new, and updated)
-  const allPlayerData = existingPlayers.concat(newPlayerData || []).concat(updatePlayers);
-
 
   // Upsert Results for each player
   for (let i = 0; i < jsonData.length; i++) {
-    const currentPlayer = allPlayerData?.find(
+    const currentPlayer = allPlayerData.find(
       (player) => player.pdga_num === jsonData[i].PDGANum
     );
+
+    if (!currentPlayer) {
+      console.error(`Player with PDGANum ${jsonData[i].PDGANum} not found.`);
+      continue;
+    }
+
     const currentPlayerID = currentPlayer.id;
 
-    const { data: resultsData, error: resultsError } = await supabase
+    const { error: resultsError } = await supabase
       .from("results")
       .upsert([
         {
@@ -168,7 +222,7 @@ export async function uploadResults(newUpload: unknown) {
     let errorMessage = "";
 
     result.error.issues.forEach((issue) => {
-      errorMessage = errorMessage + issue.path[0] + ": " + issue.message + ". ";
+      errorMessage += `${issue.path[0]}: ${issue.message}. `;
     });
 
     return {
@@ -178,8 +232,8 @@ export async function uploadResults(newUpload: unknown) {
 
   const dataToAdd = result.data.fileData;
 
-  insertData(dataToAdd, result.data);
+  await insertData(dataToAdd, result.data);  // Ensure async is awaited
 
-  revalidatePath("/td");
-  redirect("/td");
+  revalidatePath("/tddashboard");
+  redirect("/tddashboard");
 }
