@@ -24,7 +24,7 @@ export default function Navbar({ user }: Props) {
           />
           <div className="flex">
             <NavLink href="/" title="Leaderboard" />
-            <NavLink href="/results" title="Results" />
+            {/* <NavLink href="/results" title="Results" /> */}
           </div>
         </div>
         <div className="flex justify-between items-center p-3 gap-3">
