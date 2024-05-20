@@ -34,15 +34,15 @@ export default function LoginPage({
   };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-sky-50 p-6 md:p-12">
-      <div className="w-fit md:w-full min-h-fit md:grid md:min-h-full md:grid-cols-2 rounded-xl shadow-xl border bg-zinc-50">
+    <div className="h-screen w-full flex items-center justify-center bg-sky-50 dark:bg-zinc-900 p-6 md:p-12">
+      <div className="w-fit md:w-full min-h-fit md:grid md:min-h-full md:grid-cols-2 rounded-xl shadow-xl border bg-zinc-50 dark:bg-zinc-800/20 dark:border-zinc-500">
         <div className="hidden md:block ">
           <Image
             src="/farewell-fanmore.jpeg"
             alt="Fanmore Isle of Mull"
             width="1920"
             height="1080"
-            className="h-full w-full object-[75%] object-cover dark:brightness-[0.2] dark:grayscale saturate-150 shadow-lg rounded-tl-xl rounded-bl-xl"
+            className="h-full w-full object-[75%] object-cover dark:brightness-[0.6] saturate-150 shadow-lg rounded-tl-xl rounded-bl-xl"
             priority
           />
         </div>
