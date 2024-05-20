@@ -47,8 +47,8 @@ export default function LoginPage({
           />
         </div>
 
-        <div className="flex items-center justify-center px-8 py-12 animate-in">
-          <div className="mx-auto grid w-full gap-6">
+        <div className="flex items-center justify-center px-8 py-12 animate-in ">
+          <div className="mx-auto grid max-w-1/2 gap-6 ">
             <div className="grid gap-2 text-center">
               <h1 className="text-3xl font-bold">Login</h1>
               <p className="text-balance">
