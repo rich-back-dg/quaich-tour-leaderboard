@@ -12,7 +12,7 @@ export function BackButton({ href }: Props) {
       href={href}
       className="rounded-md no-underline flex items-center group text-sm max-w-fit"
     >
-      <Button variant={"secondary"}>
+      <Button variant={"outline"} size={"icon"}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -23,11 +23,11 @@ export function BackButton({ href }: Props) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1"
+          className="h-4 w-4 transition-transform group-hover:-translate-x-1"
         >
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Back
+        
       </Button>
     </Link>
   );

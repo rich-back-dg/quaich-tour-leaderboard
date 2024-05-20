@@ -8,6 +8,7 @@ import SignupDialog from "./SignupDialog";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "../../components/submit-button";
+import { BackButton } from "@/components/BackButton";
 
 export default function LoginPage({
   searchParams,
@@ -34,7 +35,10 @@ export default function LoginPage({
   };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-sky-50 dark:bg-zinc-900 p-6 md:p-12">
+    <div className="relative h-screen w-full flex items-center justify-center bg-sky-50 dark:bg-zinc-900 p-6 md:p-12">
+      <div className="md:hidden absolute top-10 left-10 border rounded-md">
+        <BackButton href={"/"} />
+      </div>
       <div className="w-fit md:w-full min-h-fit md:grid md:min-h-full md:grid-cols-2 rounded-xl shadow-xl border bg-zinc-50 dark:bg-zinc-800/20 dark:border-zinc-500">
         <div className="hidden md:block ">
           <Image
@@ -47,7 +51,10 @@ export default function LoginPage({
           />
         </div>
 
-        <div className="flex items-center justify-center px-8 py-12 animate-in ">
+        <div className="relative flex flex-col items-center justify-center px-8 py-12 animate-in">
+          <div className="absolute top-10 left-10 hidden md:block border rounded-md">
+            <BackButton href={"/"} />
+          </div>
           <div className="mx-auto grid max-w-1/2 gap-6 ">
             <div className="grid gap-2 text-center">
               <h1 className="text-3xl font-bold">Login</h1>
