@@ -113,6 +113,7 @@ export type LeaderboardResults = {
   pdga_num: string;
   id: string;
   division: string;
+  has_no_pdga_num: boolean;
 }
 
 export type Tournament = {
