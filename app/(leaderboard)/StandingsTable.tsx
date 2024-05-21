@@ -18,13 +18,13 @@ import { Badge } from "@/components/ui/badge";
 
 type Props = {
   selected: string;
-}
+};
 
 function filterBySelected(data: LeaderboardResults[], value: string) {
   if (value === "Overall") {
-    return data
+    return data;
   } else {
-    return data.filter((item) => item.division === value)
+    return data.filter((item) => item.division === value);
   }
 }
 
@@ -55,7 +55,7 @@ export default function StandingsTable({ selected }: Props) {
       try {
         const resultsData = await getLeaderboardData();
         if (resultsData) {
-          const resultsToDisplay = filterBySelected(resultsData, selected)
+          const resultsToDisplay = filterBySelected(resultsData, selected);
           setResults(resultsToDisplay);
         } else {
           toast.error("Failed to fetch results.");
@@ -94,14 +94,12 @@ export default function StandingsTable({ selected }: Props) {
                 key={tournament.id}
                 className="font-bold text-center collapse-md text-sky-50 dark:text-sky-100 w-32 relative"
               >
-                  <div className="collapse-md">
-                    {tournament.tournament_name}
+                <div className="collapse-md">{tournament.tournament_name}</div>
+                {tournament.isMajor && (
+                  <div className="absolute top-0 right-0 bg-red-500 text-white px-1 py-[1px] rounded-bl-md">
+                    <p className="self-center capitalize text-[10px]">major</p>
                   </div>
-                  {tournament.isMajor && (
-                    <div className="absolute top-0 right-0 bg-red-500 text-white px-1 py-[1px] rounded-bl-md">
-                      <p className="self-center capitalize text-[10px]">major</p>
-                    </div>
-                  )}
+                )}
               </TableHead>
             ))}
           </TableRow>
@@ -109,15 +107,22 @@ export default function StandingsTable({ selected }: Props) {
 
         <TableBody>
           {results.map((result, index) => (
-            <TableRow key={result.player_id} className="h-12 dark:border-b dark:border-b-zinc-600">
+            <TableRow
+              key={result.player_id}
+              className="h-12 dark:border-b dark:border-b-zinc-600"
+            >
               <TableCell className="text-center">{result.rank}</TableCell>
               <TableCell className="">
-                <Link
-                  href={`https://www.pdga.com/player/${result.pdga_num}`}
-                  target="_blank"
-                >
-                  {result.name}
-                </Link>
+                {result.has_no_pdga_num ? (
+                  <>{result.name}</>
+                ) : (
+                  <Link
+                    href={`https://www.pdga.com/player/${result.pdga_num}`}
+                    target="_blank"
+                  >
+                    {result.name}
+                  </Link>
+                )}
               </TableCell>
               <TableCell className="text-center">{result.division}</TableCell>
               <TableCell className="text-center font-medium">
