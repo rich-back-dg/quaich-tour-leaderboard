@@ -36,7 +36,7 @@ export default function LoginPage({
 
   return (
     <div className="relative h-screen w-full flex items-center justify-center bg-sky-50 dark:bg-zinc-900 p-6 md:p-12">
-      <div className="md:hidden absolute top-10 left-10 border rounded-md">
+      <div className="md:hidden absolute top-10 left-10 ">
         <BackButton href={"/"} />
       </div>
       <div className="w-fit md:w-full min-h-fit md:grid md:min-h-full md:grid-cols-2 rounded-xl shadow-xl border bg-zinc-50 dark:bg-zinc-800/20 dark:border-zinc-500">
