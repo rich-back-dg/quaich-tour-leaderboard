@@ -40,7 +40,8 @@ export default function Dashboard() {
   }, [idSelected === "players"]);
 
   function handleSheetItemSelect(e: React.MouseEvent<HTMLElement, MouseEvent>) {
-    setIdSelected(e.target.id)
+    const target = e.target as HTMLElement;
+    setIdSelected(target.id)
     setSheetOpenState(false)
   }
 
