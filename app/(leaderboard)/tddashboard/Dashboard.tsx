@@ -14,9 +14,11 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import CourseList from "./_courses/CourseList";
 import AddCourseForm from "./_courses/AddCourseForm";
+import AddLayoutForm from "./_courses/AddLayoutForm";
 
 export default function Dashboard() {
   const [idSelected, setIdSelected] = useState("upload");
+  const [sheetOpenState, setSheetOpenState] = useState(false)
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
@@ -36,6 +38,11 @@ export default function Dashboard() {
 
     fetchPlayers();
   }, [idSelected === "players"]);
+
+  function handleSheetItemSelect(e: React.MouseEvent<HTMLElement, MouseEvent>) {
+    setIdSelected(e.target.id)
+    setSheetOpenState(false)
+  }
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] bg-zinc-100">
@@ -85,34 +92,55 @@ export default function Dashboard() {
       <div className="flex flex-col">
         {/* MOBILE SIDEBAR */}
         <header className="flex h-14 items-center gap-4 border-b px-4">
-          <Sheet>
+          <Sheet open={sheetOpenState} >
             <SheetTrigger asChild>
               <Button
                 variant="outline"
                 size="icon"
                 className="shrink-0 md:hidden"
+                onClick={() => setSheetOpenState(true)}
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
-              <nav className="grid gap-2 text-lg font-medium">
+              <nav className="grid gap-2 text-lg font-medium" onClick={(e) => handleSheetItemSelect(e)}>
                 <Link
                   href="#"
+                  id="upload"
                   className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2"
-                  onClick={() => setIdSelected("tournaments")}
+                  // onClick={(e) => handleSheetItemSelect(e)}
+                >
+                  <TableIcon className="h-5 w-5" />
+                  Upload Results
+                </Link>
+                <Link
+                  href="#"
+                  id="players"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2"
+                  // onClick={(e) => handleSheetItemSelect(e)}
+                >
+                  <Users className="h-5 w-5" />
+                  Players
+                </Link>
+                <Link
+                  href="#"
+                  id="tournaments"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2"
+                  // onClick={(e) => handleSheetItemSelect(e)}
                 >
                   <Calendar className="h-5 w-5" />
                   Tournaments
                 </Link>
                 <Link
                   href="#"
+                  id="courses"
                   className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2"
-                  onClick={() => setIdSelected("upload")}
+                  // onClick={(e) => handleSheetItemSelect(e)}
                 >
                   <TableIcon className="h-5 w-5" />
-                  Upload Results
+                  Courses
                 </Link>
               </nav>
             </SheetContent>
