@@ -5,7 +5,7 @@ import StandingsTable from "./StandingsTable";
 import { useEffect, useState } from "react";
 import { getDivisionsList } from "@/db/queries";
 import toast from "react-hot-toast";
-import { LucideInfo } from "lucide-react";
+import { LucideInfo, Smartphone } from "lucide-react";
 import { Division } from "@/lib/types";
 import { divisionsSortedByRank } from "@/lib/utils";
 
@@ -48,7 +48,9 @@ export default function Standings() {
             priority
           />
           <div className=" absolute bottom-3 left-0 my-4 ml-6 flex flex-col gap-3 w-fit">
-            <h2 className="font-medium text-4xl text-white">Leaderboard</h2>
+            <h2 className="font-medium text-4xl text-white leading-none align-text-bottom">
+              Leaderboard
+            </h2>
             <div>
               <select className="px-3 py-1" onChange={(e) => handleSelect(e)}>
                 <option value="Overall">Overall</option>
@@ -64,17 +66,26 @@ export default function Standings() {
         <div className="animate-in flex flex-col items-center gap-20 opacity-0 w-full px-5">
           <main className="flex-1 flex flex-col gap-6 w-full items-center ">
             <div className="w-full py-4 flex flex-col gap-5">
-              <div className="bg-white dark:bg-zinc-800/80 p-4 shadow-md text-sm">
-                <LucideInfo
-                  strokeWidth={2}
-                  className="w-4 h-4 mb-3 text-blue-600 dark:text-blue-300"
-                />
-                <p className="text-zinc-600 dark:text-zinc-100">
-                  Players&apos; overall points for the Quaich Tour will be taken
-                  from their best 5 points finishes. Quaich Tour Majors are
-                  worth 120% of the points of regular events. Any dropped events
-                  will be shown in gray below.
-                </p>
+              <div className="bg-white dark:bg-zinc-800/80 p-4 shadow-md text-sm flex flex-col lg:flex-row gap-2">
+                <div className="flex items-center justify-center gap-2 bg-zinc-100 dark:bg-zinc-700/30 p-3 rounded-md w-fit md:w-full">
+                  <p className="text-zinc-600 dark:text-zinc-100">
+                    <LucideInfo
+                      strokeWidth={2}
+                      className="w-4 h-4 mb-1 text-blue-600 dark:text-blue-300"
+                    />
+                    Players&apos; overall points for the Quaich Tour will be
+                    taken from their best 5 points finishes. Quaich Tour Majors
+                    are worth 120% of the points of regular events. Any dropped
+                    events will be shown in gray below.
+                  </p>
+                </div>
+                <div className="md:hidden flex items-start justify-center gap-2 bg-zinc-100 dark:bg-zinc-700/30 p-3 rounded-md w-fit lg:w-1/2">
+                  <p className="">
+                    <Smartphone strokeWidth={2} className="w-4 h-4 mb-1" />
+                    <b>Note: </b>When viewing on Mobile devices, try landscape mode to view the full
+                    table of results
+                  </p>
+                </div>
               </div>
               <StandingsTable selected={selected} />
             </div>
