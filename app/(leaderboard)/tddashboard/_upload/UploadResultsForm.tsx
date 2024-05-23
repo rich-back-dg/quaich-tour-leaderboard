@@ -48,6 +48,8 @@ export default function UploadResultsForm() {
     []
   );
 
+  console.log('layouts per div: ', layoutsPerDivision)
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -155,6 +157,8 @@ export default function UploadResultsForm() {
       }
       layoutsToDivisions[layoutsPlayed].push(division);
     });
+
+    console.log("layouts to divs: ", layoutsToDivisions)
 
     // Group divisions that played the same layouts
     const groupedDivisions: string[][] = Object.values(layoutsToDivisions);
@@ -289,6 +293,7 @@ export default function UploadResultsForm() {
     if (isMultipleLayouts) {
       // Establish Division groupings based on layoutPerDivision
       const divisionGroupings = groupDivisionsByLayouts(layoutsPerDivision);
+      console.log("groupings: ", divisionGroupings)
       // Group the fileData rows by the established groupings
       const resultsDataGroupings = groupResultsByDivision(
         dataWithDNFsFiltered,
