@@ -17,36 +17,45 @@ export default function LayoutsPerDivisionForm({
   layoutsPerDivision,
   setLayoutsPerDivision,
 }: Props) {
-  const handleLayoutSelect = async (
+
+  const handleLayoutSelect = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const layoutSelected = e.target.value;
     const division = e.target.id;
     const roundNumber = e.target.name;
 
-    // Find if the division already exists in layoutsPerDivision
-    const divisionIndex = layoutsPerDivision.findIndex(
-      (eventRound) => eventRound.division === division
-    );
+    setLayoutsPerDivision((prevLayoutsPerDivision) => {
+      const divisionIndex = prevLayoutsPerDivision.findIndex(
+        (eventRound) => eventRound.division === division
+      );
 
-    // If the division already exists, update its corresponding round
-    if (divisionIndex !== -1) {
-      const updatedLayoutsPerDivision = [...layoutsPerDivision];
-      updatedLayoutsPerDivision[divisionIndex].rounds.push({
-        round: roundNumber,
-        layout: layoutSelected,
-      });
-      setLayoutsPerDivision(updatedLayoutsPerDivision);
-    } else {
-      // If the division doesn't exist, create a new EventRounds object
-      setLayoutsPerDivision((prevLayoutsPerDivision) => [
-        ...prevLayoutsPerDivision,
-        {
-          division,
-          rounds: [{ round: roundNumber, layout: layoutSelected }],
-        },
-      ]);
-    }
+      if (divisionIndex !== -1) {
+        const updatedRounds = [...prevLayoutsPerDivision[divisionIndex].rounds];
+        const roundIndex = updatedRounds.findIndex(
+          (round) => round.round === roundNumber
+        );
+
+        if (roundIndex !== -1) {
+          updatedRounds[roundIndex].layout = layoutSelected;
+        } else {
+          updatedRounds.push({ round: roundNumber, layout: layoutSelected });
+        }
+
+        const updatedLayoutsPerDivision = [...prevLayoutsPerDivision];
+        updatedLayoutsPerDivision[divisionIndex].rounds = updatedRounds;
+
+        return updatedLayoutsPerDivision;
+      } else {
+        return [
+          ...prevLayoutsPerDivision,
+          {
+            division,
+            rounds: [{ round: roundNumber, layout: layoutSelected }],
+          },
+        ];
+      }
+    });
   };
 
   return (
