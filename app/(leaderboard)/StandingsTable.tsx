@@ -73,7 +73,7 @@ export default function StandingsTable({ selected }: Props) {
     <div className="h-fit relative overflow-auto shadow-lg">
       <Table className="bg-white dark:bg-zinc-800/50">
         <TableHeader className="sticky top-0 bg-sky-900 ">
-          <TableRow className="text-[11px] leading-3 uppercase h-16 hover:bg-inherit">
+          <TableRow className="text-[11px] leading-3 uppercase h-20 hover:bg-inherit">
             <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100">
               Pos
             </TableHead>
@@ -86,21 +86,23 @@ export default function StandingsTable({ selected }: Props) {
             <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100">
               Points
             </TableHead>
-            <TableHead className="text-center font-bold collapse-md text-sky-50 dark:text-sky-100">
+            <TableHead className="text-center font-bold hidden md:table-cell landscape:table-cell text-sky-50 dark:text-sky-100">
               Events Played
             </TableHead>
             {tournaments.map((tournament) => (
               <TableHead
-                key={tournament.id}
-                className="font-bold text-center collapse-md text-sky-50 dark:text-sky-100 w-32 relative"
-              >
-                <div className="collapse-md">{tournament.tournament_name}</div>
+              key={tournament.id}
+              className="font-bold text-center hidden md:table-cell landscape:table-cell text-sky-50 dark:text-sky-100 w-32 relative"
+            >
+              <div className="flex flex-col items-center justify-center">
+                <div>{tournament.tournament_name}</div>
                 {tournament.isMajor && (
                   <div className="absolute top-0 right-0 bg-red-500 text-white px-1 py-[1px] rounded-bl-md">
                     <p className="self-center capitalize text-[10px]">major</p>
                   </div>
                 )}
-              </TableHead>
+              </div>
+            </TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -112,7 +114,7 @@ export default function StandingsTable({ selected }: Props) {
               className="h-12 dark:border-b dark:border-b-zinc-600"
             >
               <TableCell className="text-center">{result.rank}</TableCell>
-              <TableCell className="">
+              <TableCell >
                 {result.has_no_pdga_num ? (
                   <>{result.name}</>
                 ) : (
@@ -128,7 +130,7 @@ export default function StandingsTable({ selected }: Props) {
               <TableCell className="text-center font-medium">
                 {result.total_tour_points}
               </TableCell>
-              <TableCell className="text-center collapse-md">
+              <TableCell className="text-center hidden md:table-cell landscape:table-cell">
                 {result.events_played}
               </TableCell>
               {tournaments.map((tournament) => {
@@ -140,8 +142,8 @@ export default function StandingsTable({ selected }: Props) {
                     key={tournament.id}
                     className={
                       playerResult && !playerResult?.is_counted
-                        ? "bg-sky-50/75 collapse-md"
-                        : "collapse-md"
+                        ? "bg-sky-50/75 hidden md:table-cell landscape:table-cell"
+                        : "hidden md:table-cell landscape:table-cell"
                     }
                   >
                     {playerResult ? (
