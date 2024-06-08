@@ -70,9 +70,9 @@ export default function StandingsTable({ selected }: Props) {
   }, [selected]);
 
   return (
-    <div className="h-fit relative overflow-auto shadow-lg">
+    <div className="h-[1000px] relative overflow-auto shadow-lg">
       <Table className="bg-white dark:bg-zinc-800/50">
-        <TableHeader className="sticky top-0 bg-sky-900 ">
+        <TableHeader className="sticky top-0 bg-sky-900 z-10">
           <TableRow className="text-[11px] leading-3 uppercase h-20 hover:bg-inherit">
             <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100">
               Pos
@@ -91,18 +91,18 @@ export default function StandingsTable({ selected }: Props) {
             </TableHead>
             {tournaments.map((tournament) => (
               <TableHead
-              key={tournament.id}
-              className="font-bold text-center hidden md:table-cell landscape:table-cell text-sky-50 dark:text-sky-100 w-32 relative"
-            >
-              <div className="flex flex-col items-center justify-center">
-                <div>{tournament.tournament_name}</div>
-                {tournament.isMajor && (
-                  <div className="absolute top-0 right-0 bg-red-500 text-white px-1 py-[1px] rounded-bl-md">
-                    <p className="self-center capitalize text-[10px]">major</p>
-                  </div>
-                )}
-              </div>
-            </TableHead>
+                key={tournament.id}
+                className="font-bold text-center hidden md:table-cell landscape:table-cell text-sky-50 dark:text-sky-100 w-32 relative"
+              >
+                <div className="flex flex-col items-center justify-center">
+                  <div>{tournament.tournament_name}</div>
+                  {tournament.isMajor && (
+                    <div className="absolute top-0 right-0 bg-red-500 text-white px-1 py-[1px] rounded-bl-md">
+                      <p className="self-center capitalize text-[10px]">major</p>
+                    </div>
+                  )}
+                </div>
+              </TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -114,7 +114,7 @@ export default function StandingsTable({ selected }: Props) {
               className="h-12 dark:border-b dark:border-b-zinc-600"
             >
               <TableCell className="text-center">{result.rank}</TableCell>
-              <TableCell >
+              <TableCell>
                 {result.has_no_pdga_num ? (
                   <>{result.name}</>
                 ) : (
