@@ -2,7 +2,6 @@ import { Catamaran as Cata } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Copyright } from "lucide-react";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -11,7 +10,7 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Quaich Tour Leaderboard",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  description: "The home of the current Quaich Tour standings",
 };
 
 const cata = Cata({
