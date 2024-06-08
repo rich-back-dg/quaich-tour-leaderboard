@@ -149,7 +149,6 @@ export default function Dashboard() {
         </header>
 
         <main
-          id="dash"
           className={
             idSelected === "tournaments"
               ? "flex flex-1 flex-col gap-4 p-6 bg-white"
@@ -165,7 +164,6 @@ export default function Dashboard() {
         </main>
 
         <main
-          id="orders"
           className={
             idSelected === "upload"
               ? "flex flex-1 flex-col gap-4 p-6 bg-white"
@@ -181,7 +179,6 @@ export default function Dashboard() {
         </main>
 
         <main
-          id="players"
           className={
             idSelected === "players"
               ? "flex flex-1 flex-col gap-4 p-6 bg-white"
@@ -197,7 +194,6 @@ export default function Dashboard() {
         </main>
 
         <main
-          id="players"
           className={
             idSelected === "courses"
               ? "flex flex-1 flex-col gap-4 p-6 bg-white"
