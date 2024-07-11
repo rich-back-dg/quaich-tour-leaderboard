@@ -66,9 +66,16 @@ export default function StandingsTable({ selected }: Props) {
     fetchResults();
   }, [selected]);
 
+    // Calculate dynamic table width based on tournaments length
+    const calculateTableWidth = () => {
+      const fixedColumnsWidth = 416; // Width of the first 5 fixed columns (adjust as needed)
+      const tournamentColumnsWidth = 128 * tournaments.length; // Width of tournament columns
+      return fixedColumnsWidth + tournamentColumnsWidth;
+    };
+
   return (
     <div className="relative w-full shadow-lg overflow-x-auto">
-      <div className="w-full md:w-[1184px] h-[1004px]">
+      <div className={`w-full md:w-[${calculateTableWidth()}px] h-[1004px]`}>
         <Table className="bg-white dark:bg-zinc-800/50">
           <TableHeader className="bg-sky-900">
             <TableRow className="text-[11px] leading-3 uppercase h-20 hover:bg-inherit z-40">
