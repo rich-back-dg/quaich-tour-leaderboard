@@ -38,7 +38,7 @@ export default function Standings() {
 
   return (
     <div className="bg-sky-50 dark:bg-zinc-800/50 w-full flex justify-center">
-      <div className="flex-1 flex flex-col gap-10 items-center max-w-6xl bg-sky-100 dark:bg-zinc-900">
+      <div className="flex-1 flex flex-col gap-10 items-center w-full md:max-w-6xl bg-sky-100 dark:bg-zinc-900">
         <div className="relative w-full h-80">
           <Image
             src="/banner.jpeg"
