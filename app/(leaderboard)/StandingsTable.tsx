@@ -75,7 +75,7 @@ export default function StandingsTable({ selected }: Props) {
 
   return (
     <div className="relative w-full shadow-lg overflow-x-auto">
-      <div className={`w-full md:w-[${calculateTableWidth()}px] h-[1004px]`}>
+      <div className="w-full md:w-[1440px] h-[1000px]">
         <Table className="bg-white dark:bg-zinc-800/50">
           <TableHeader className="bg-sky-900">
             <TableRow className="text-[11px] leading-3 uppercase h-20 hover:bg-inherit z-40">
@@ -153,7 +153,7 @@ export default function StandingsTable({ selected }: Props) {
                       key={tournament.id}
                       className={
                         playerResult && !playerResult?.is_counted
-                          ? "bg-sky-50/75 dark:bg-zinc-800 hidden md:table-cell landscape:table-cell w-32 z-30"
+                          ? "bg-sky-50/75 dark:bg-zinc-700 hidden md:table-cell landscape:table-cell w-32 z-30"
                           : "dark:bg-zinc-800 hidden md:table-cell landscape:table-cell w-32 z-30"
                       }
                     >
@@ -172,7 +172,7 @@ export default function StandingsTable({ selected }: Props) {
                             className={
                               playerResult.is_counted
                                 ? "text-xs font-extralight"
-                                : "text-xs font-extralight line-through"
+                                : "text-xs font-extralight line-through dark:text-gray-400"
                             }
                           >
                             ({playerResult.event_points})
