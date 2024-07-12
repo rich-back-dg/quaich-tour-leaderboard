@@ -75,29 +75,29 @@ export default function StandingsTable({ selected }: Props) {
 
   return (
     <div className="relative w-full shadow-lg overflow-x-auto">
-      <div className="w-full md:w-[1440px] h-[1000px]">
+      <div className="w-full sm:w-[1440px] h-[1000px]">
         <Table className="bg-white dark:bg-zinc-800/50">
           <TableHeader className="bg-sky-900">
             <TableRow className="text-[11px] leading-3 uppercase h-20 hover:bg-inherit z-40">
-              <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100 bg-sky-900 z-40 sticky top-0 left-0 w-16 px-0 ">
+              <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100 bg-sky-900 z-40 sticky top-0 sm:left-0 sm:w-16 px-0 ">
                 Pos
               </TableHead>
-              <TableHead className="text-left font-bold text-sky-50 dark:text-sky-100 bg-sky-900 z-40 sticky top-0 left-[64px] w-40 px-0">
+              <TableHead className="text-left font-bold text-sky-50 dark:text-sky-100 bg-sky-900 z-40 sticky top-0 sm:left-[64px] sm:w-40 px-0">
                 Player
               </TableHead>
-              <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100 bg-sky-900 z-40 sticky top-0 left-[224px] w-16 px-0">
+              <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100 bg-sky-900 z-40 sticky top-0 sm:left-[224px] sm:w-16 px-0">
                 Division
               </TableHead>
-              <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100 bg-sky-900 z-40 sticky top-0 left-[288px] w-16 px-0">
+              <TableHead className="text-center font-bold text-sky-50 dark:text-sky-100 bg-sky-900 z-40 sticky top-0 sm:left-[288px] sm:w-16 px-0">
                 Points
               </TableHead>
-              <TableHead className="text-center font-bold hidden md:table-cell landscape:table-cell text-sky-50 dark:text-sky-100 bg-sky-900 z-40 sticky top-0 left-[352px] w-16 px-0">
+              <TableHead className="text-center font-bold hidden sm:table-cell landscape:table-cell text-sky-50 dark:text-sky-100 bg-sky-900 z-40 sticky top-0 sm:left-[352px] w-16 px-0">
                 Events Played
               </TableHead>
               {tournaments.map((tournament) => (
                 <TableHead
                   key={tournament.id}
-                  className="font-bold text-center hidden landscape:table-cell text-sky-50 dark:text-sky-100 w-32 bg-sky-900 sticky top-0 z-30"
+                  className="font-bold text-center hidden sm:table-cell landscape:table-cell text-sky-50 dark:text-sky-100 w-32 bg-sky-900 sticky top-0 z-30"
                 >
                     <div className="flex flex-col items-center justify-center">
                       <div>{tournament.tournament_name}</div>
@@ -141,7 +141,7 @@ export default function StandingsTable({ selected }: Props) {
                 <TableCell className="text-center font-medium dark:bg-zinc-800 z-30 sticky left-[288px] w-16 bg-white">
                   {result.total_tour_points}
                 </TableCell>
-                <TableCell className="text-center hidden md:table-cell landscape:table-cell dark:bg-zinc-800 z-30 sticky left-[352px] w-16 bg-white">
+                <TableCell className="text-center hidden sm:table-cell landscape:table-cell dark:bg-zinc-800 z-30 sticky left-[352px] w-16 bg-white">
                   {result.events_played}
                 </TableCell>
                 {tournaments.map((tournament) => {
@@ -153,8 +153,8 @@ export default function StandingsTable({ selected }: Props) {
                       key={tournament.id}
                       className={
                         playerResult && !playerResult?.is_counted
-                          ? "bg-sky-50/75 dark:bg-zinc-700 hidden md:table-cell landscape:table-cell w-32 z-30"
-                          : "dark:bg-zinc-800 hidden md:table-cell landscape:table-cell w-32 z-30"
+                          ? "bg-sky-50/75 dark:bg-zinc-700 hidden sm:table-cell landscape:table-cell w-32 z-30"
+                          : "dark:bg-zinc-800 hidden sm:table-cell landscape:table-cell w-32 z-30"
                       }
                     >
                       {playerResult ? (
