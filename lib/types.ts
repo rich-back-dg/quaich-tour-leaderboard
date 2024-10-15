@@ -22,6 +22,12 @@ export type DivisionRanking = {
   rank: number;
 }
 
+export type DivisionWinner = {
+  first_name: string;
+  last_name: string;
+  division: string;
+}
+
 export type EventRounds = {
   division: string;
   rounds: {
@@ -43,7 +49,7 @@ export const LayoutSchema = z.object({
 
 export const CourseSchema = z.object({
   course_name: z.string(),
-  course_id: z.string()
+  course_id: z.number().optional()
 });
 
 export const uploadFormSchema = z.object({
@@ -114,6 +120,8 @@ export type LeaderboardResults = {
   id: string;
   division: string;
   has_no_pdga_num: boolean;
+  lowest_counting_score: number;
+  division_placing: number;
 }
 
 export type Tournament = {
