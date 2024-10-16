@@ -151,7 +151,7 @@ export default function StandingsTable({ selected }: Props) {
                       {result.total_tour_points}
                     </div>
                     <div className="text-xs font-extralight italic">
-                      {result.lowest_counting_score}
+                      {result.lowest_counting_score ? result.lowest_counting_score : '-'}
                     </div>
                   </div>
                 </TableCell>
