@@ -93,7 +93,7 @@ export default function StandingsTable({ selected }: Props) {
                     <div className="">
                       Points
                     </div>
-                    <div className="text-[10px] capitalize italic font-extralight">
+                    <div className="text-[10px] capitalize italic font-extralight text-balance">
                       lowest counting score
                     </div>
                   </div>
