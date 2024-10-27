@@ -1,16 +1,35 @@
 "use client";
 
-import { getDivisionsList } from "@/db/queries";
-import { Division } from "@/lib/types";
+import { getChampionData, getDivisionsList } from "@/db/queries";
+import { Division, LeaderboardResults } from "@/lib/types";
 import { divisionsSortedByRank } from "@/lib/utils";
 import { LucideInfo } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import PodiumCard from "./PodiumCard";
+import ChampCard from "./ChampCard";
+
+const defaultChampion: LeaderboardResults = {
+  player_id: "",
+  events_played: 0,
+  total_tour_points: 0,
+  player_results: [],
+  rank: 0,
+  name: "",
+  first_name: "",
+  last_name: "",
+  pdga_num: "",
+  id: "",
+  division: "",
+  has_no_pdga_num: false,
+  lowest_counting_score: 0,
+  division_placing: 0
+};
 
 export default function page() {
   const [divisionsList, setDivisionsList] = useState<Division[]>([]);
+  const [champion, setChampion] = useState<LeaderboardResults>(defaultChampion);
 
   useEffect(() => {
     const fetchDivisions = async () => {
@@ -31,6 +50,24 @@ export default function page() {
     fetchDivisions();
   }, []);
 
+  useEffect(() => {
+    const fetchChampion = async () => {
+      try {
+        const champData = await getChampionData()
+        if (champData) {
+          setChampion(champData);
+        } else {
+          toast.error("Failed to fetch champion data.");
+        }
+      } catch (error) {
+        console.error("Error fetching champion data:", error);
+        toast.error("Failed to fetch champion data.");
+      }
+    };
+
+    fetchChampion();
+  }, []);
+
 
   return (
     <div className="bg-sky-50 dark:bg-zinc-800/50 w-full flex justify-center">
@@ -40,7 +77,7 @@ export default function page() {
             src="/winter.jpg"
             alt="leaders page banner image"
             fill
-            className="h-80 w-full object-cover object-[100%_28%] opacity-90 shadow-md"
+            className="h-80 w-full object-cover opacity-90 shadow-md"
             priority
           />
           <div className=" absolute bottom-1 left-0 my-4 ml-6 flex flex-col gap-1 w-fit">
@@ -55,15 +92,13 @@ export default function page() {
         </div>
         <div className="animate-in flex flex-col items-center gap-10 opacity-0 w-full px-5">
           <main className="flex-1 flex flex-col gap-6 w-full items-center ">
-            <div className="w-full py-4 flex flex-col gap-5">
-              <div className="bg-white dark:bg-zinc-800/80 p-4 shadow-md text-sm flex flex-col lg:flex-row gap-2">
-                <div className="flex items-center justify-center gap-2 bg-zinc-100 dark:bg-zinc-700/30 p-3 rounded-md w-full">
-                  <p className="text-zinc-600 dark:text-zinc-100">
-                    Image of Rick - QT24 Champ
-                  </p>
+            <div className="w-full py-4 flex flex-col items-center gap-5">
+              <div className="bg-white dark:bg-zinc-800/80 p-4 shadow-md w-full max-w-[600px]">
+                <div className="overflow-hidden rounded-md w-full max-w-[600px]">
+                  <ChampCard champion={champion}/>
                 </div>
               </div>
-              <div className="bg-white dark:bg-zinc-800/80 p-4 shadow-md text-sm flex flex-col gap-6">
+              <div className="bg-white dark:bg-zinc-800/80 p-4 shadow-md text-sm flex flex-col gap-6 w-full max-w-[600px]">
                 {divisionsList.map((division) => (
                     <PodiumCard key={division.division} division={division} />
                 ))}
