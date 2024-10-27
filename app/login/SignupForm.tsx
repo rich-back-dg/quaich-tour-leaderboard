@@ -14,6 +14,7 @@ import { SubmitButton } from "../../components/submit-button";
 import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { BackButton } from "@/components/BackButton";
 
 type Props = {
   signupType: string;
@@ -21,7 +22,6 @@ type Props = {
 };
 
 export default function SignupForm({ signupType, searchParams }: Props) {
-
   const signUpTD = async (formData: FormData) => {
     "use server";
 
@@ -46,7 +46,7 @@ export default function SignupForm({ signupType, searchParams }: Props) {
           data: {
             signup_code: signup_code,
             first_name: first_name,
-            last_name: last_name
+            last_name: last_name,
           },
         },
       });
@@ -64,6 +64,9 @@ export default function SignupForm({ signupType, searchParams }: Props) {
   };
   return (
     <div className="mx-auto grid w-[350px] gap-6">
+      <div className="absolute top-10 left-10 hidden md:block border rounded-md">
+        <BackButton href={"/login"} />
+      </div>
       <div className="grid gap-2 text-center">
         <h1 className="text-3xl font-bold">{signupType} Sign Up</h1>
         <p className="text-balance text-muted-foreground">

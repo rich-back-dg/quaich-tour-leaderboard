@@ -279,11 +279,11 @@ begin
 end;$function$
 ;
 
-create type "public"."tablefunc_crosstab_2" as ("row_name" text, "category_1" text, "category_2" text);
+-- create type "public"."tablefunc_crosstab_2" as ("row_name" text, "category_1" text, "category_2" text);
 
-create type "public"."tablefunc_crosstab_3" as ("row_name" text, "category_1" text, "category_2" text, "category_3" text);
+-- create type "public"."tablefunc_crosstab_3" as ("row_name" text, "category_1" text, "category_2" text, "category_3" text);
 
-create type "public"."tablefunc_crosstab_4" as ("row_name" text, "category_1" text, "category_2" text, "category_3" text, "category_4" text);
+-- create type "public"."tablefunc_crosstab_4" as ("row_name" text, "category_1" text, "category_2" text, "category_3" text, "category_4" text);
 
 create or replace view "public"."tour_leaderboard_view" as  SELECT tl.player_id,
     tl.events_played,
