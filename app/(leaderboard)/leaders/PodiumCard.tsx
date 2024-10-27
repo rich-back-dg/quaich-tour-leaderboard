@@ -3,7 +3,7 @@
 import { getDivisionTopThree } from "@/db/queries";
 import { Division, DivisionTopThree } from "@/lib/types";
 import { useState, useEffect } from "react";
-import { TrophyIcon, SquareArrowOutUpRight } from "lucide-react";
+import { TrophyIcon, SquareArrowOutUpRight, Medal } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -30,9 +30,9 @@ type Props = {
 };
 
 const pinImages = [
-  { url: "/qt-pin-gold.png", size: 30 },
-  { url: "/qt-pin-silver.png", size: 27 },
-  { url: "/qt-pin-bronze.png", size: 25 },
+  { url: "/qt-pin-gold.png", size: 30, color: "ring-gold" },
+  { url: "/qt-pin-silver.png", size: 27, color: "ring-silver" },
+  { url: "/qt-pin-bronze.png", size: 25, color: "ring-bronze" },
 ];
 
 export default function PodiumCard({ division }: Props) {
@@ -58,24 +58,6 @@ export default function PodiumCard({ division }: Props) {
     fetchTopThree();
   }, []);
 
-  function trophyColour(rank: number): string {
-    let colour: string = "";
-
-    switch (rank) {
-      case 1:
-        colour = "text-amber-400 w-6 h-6 stroke-2";
-        break;
-      case 2:
-        colour = "text-slate-400 w-5 h-5 stroke-[1.5]";
-        break;
-      case 3:
-        colour = "text-amber-800 w-5 h-5 stroke-1";
-        break;
-    }
-
-    return colour;
-  }
-
   return (
     <Card className="relative rounded-none bg-sky-50 dark:bg-zinc-900/50 border-0 overflow-hidden">
       <Image
@@ -96,8 +78,15 @@ export default function PodiumCard({ division }: Props) {
         <Table className="bg-white dark:bg-zinc-800">
           <TableHeader className="bg-sky-900 hover:bg-sky-900 ">
             <TableRow className="h-12 text-[11px] leading-3 font-bold">
-              <TableHead className="text-center text-white dark:text-sky-100 bg-sky-900 uppercase">
-                Pos
+              <TableHead className="text-white dark:text-sky-100 bg-sky-900">
+                <div className="flex items-center justify-center">
+                  <Medal
+                    size={18}
+                    strokeWidth={1}
+                    color="white"
+                    className="text-center"
+                  />
+                </div>
               </TableHead>
               <TableHead className=" text-white uppercase dark:text-sky-100 bg-sky-900 ">
                 Name
@@ -119,18 +108,15 @@ export default function PodiumCard({ division }: Props) {
                 key={player.name}
                 className="first:text-[14px] text-[13px] first:font-semibold h-12 border-b-0 dark:border-b-zinc-600"
               >
-                <TableCell className="">
-                  {/* <TrophyIcon
-                    className={`mx-auto ${trophyColour(
-                      player.rank
-                    )}`}
-                  /> */}
+                <TableCell>
                   <Image
                     src={pinImages[player.rank - 1].url}
                     alt="qt pin icon"
                     width={pinImages[player.rank - 1].size}
                     height={pinImages[player.rank - 1].size}
-                    className="mx-auto"
+                    className={`mx-auto ring-2 ${
+                      pinImages[player.rank - 1].color
+                    } rounded-full`}
                   />
                 </TableCell>
                 <TableCell className="">{player.name}</TableCell>
@@ -153,7 +139,9 @@ export default function PodiumCard({ division }: Props) {
           href={`/?division=${division.division}`}
           className="flex gap-1 justify-center items-center"
         >
-          <p className="text-sky-900 dark:text-sky-100">Full Division Results </p>
+          <p className="text-sky-900 dark:text-sky-100">
+            Full Division Results{" "}
+          </p>
           <SquareArrowOutUpRight size={13} />
         </Link>
       </CardFooter>
