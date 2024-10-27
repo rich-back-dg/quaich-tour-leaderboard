@@ -1,4 +1,5 @@
 import { LeaderboardResults } from "@/lib/types";
+import { formatOrdinals } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -41,6 +42,17 @@ export default function ChampCard({ champion }: Props) {
               <p className="font-light">#{champion.pdga_num}</p>
             </Link>
           </div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-2 left-2 bg-black/35 rounded-sm p-2">
+        <div className="text-sm text-sky-50">
+          {champion.player_results.map((result) => (
+            <div key={result.id} className="grid grid-flow-col gap-2">
+              <div className="font-semibold">{formatOrdinals(result.overall_placing)}</div>
+              <div>{result.tournament_name}</div>
+            </div>
+          ))}
         </div>
       </div>
 
