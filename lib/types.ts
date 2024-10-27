@@ -154,6 +154,7 @@ export type PlayerResult = {
     tournament_id: string,
     overall_placing: number,
     division_placing: string,
+    tournament_name: string,
 }
 
 export type Division = {
