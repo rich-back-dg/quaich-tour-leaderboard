@@ -28,6 +28,16 @@ export type DivisionWinner = {
   division: string;
 }
 
+export type DivisionTopThree = {
+  events_played: number;
+  total_tour_points: number;
+  rank: number;
+  division_placing: number;
+  name: string;
+  division: string;
+  points_average: number;
+}
+
 export type EventRounds = {
   division: string;
   rounds: {
