@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "../utils/supabase/server";
-import { Course, Division, LeaderboardResults, Player, Tournament } from "@/lib/types";
+import { Course, Division, DivisionTopThree, DivisionWinner, LeaderboardResults, Player, PlayerResult, Tournament } from "@/lib/types";
 import { Layout } from "@/lib/types";
 
 const supabase = createClient();
@@ -37,6 +37,44 @@ export async function getLayoutsForCourse(
     return layouts || null;
   } catch (error) {
     console.error("Error fetching layouts: ", error);
+    return null;
+  }
+}
+
+export async function getDivisionWinnersForTournament(
+  tournament_id_to_search: string
+): Promise<DivisionWinner[] | null> {
+  try {
+    const { data, error } = await supabase
+    .rpc('get_first_place_players', {
+      tournament_id_to_search
+    })
+    if (error) {
+      throw new Error(`Could not fetch division winners data: ${error.message}`);
+    }
+
+    return data || null;
+  } catch (error) {
+    console.error("Error fetching division winners: ", error);
+    return null;
+  }
+}
+
+export async function getDivisionTopThree(
+  p_division: string
+): Promise<DivisionTopThree[] | null> {
+  try {
+    const { data, error } = await supabase
+    .rpc('get_top_players_by_division', {
+      p_division
+    })
+    if (error) {
+      throw new Error(`Could not fetch division top 3 data: ${error.message}`);
+    }
+    
+    return data || null;
+  } catch (error) {
+    console.error("Error fetching division top 3: ", error);
     return null;
   }
 }
