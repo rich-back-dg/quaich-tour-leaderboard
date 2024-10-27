@@ -148,6 +148,27 @@ export async function getLeaderboardData(): Promise<LeaderboardResults[] | null>
   }
 }
 
+export async function getChampionData(): Promise<LeaderboardResults | null> {
+
+  try {
+    const { data: championData, error } = await supabase
+      .from("tour_leaderboard_view")
+      .select()
+      .eq("rank", 1)
+      .single()
+  
+    if (error) {
+      console.error("Could not fetch champion data: ", error.message);
+    }
+  
+    return championData ?? {};
+    
+  } catch (error) {
+    console.error("Error fetching Champion Data: ", error)
+    return null;
+  }
+}
+
 export async function getDivisionsList(): Promise<Division[] | null> {
 
   try {
