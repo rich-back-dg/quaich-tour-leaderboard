@@ -35,9 +35,9 @@ export async function addTournament(newTournament: unknown) {
 
   if (error) {
     console.log(error.message);
-    redirect("/td/schedule");
+    redirect("/tddashboard");
   }
 
-  revalidatePath("/td/schedule");
-  redirect("/td/schedule");
+  revalidatePath("/tddashboard");
+  redirect("/tddashboard");
 }

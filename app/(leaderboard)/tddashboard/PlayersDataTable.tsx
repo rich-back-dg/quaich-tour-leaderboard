@@ -113,6 +113,7 @@ export function PlayersDataTable<TData, TValue>({
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="text-zinc-600 text-sm">{table.getRowCount()} {table.getRowCount() === 1 ? "Result" : "Results"}</div>
         <Button
           variant="outline"
           size="sm"
@@ -122,9 +123,7 @@ export function PlayersDataTable<TData, TValue>({
           Previous
         </Button>
         <div className="text-zinc-600 text-sm">
-          {" "}
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
+          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </div>
         <Button
           variant="outline"

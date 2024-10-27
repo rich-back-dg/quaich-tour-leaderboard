@@ -3,6 +3,7 @@
 import Image from "next/image";
 import StandingsTable from "./StandingsTable";
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation"; // Updated import
 import { getDivisionsList } from "@/db/queries";
 import toast from "react-hot-toast";
 import { LucideInfo, Smartphone } from "lucide-react";
@@ -10,6 +11,8 @@ import { Division } from "@/lib/types";
 import { divisionsSortedByRank } from "@/lib/utils";
 
 export default function Standings() {
+  const router = useRouter();
+  const searchParams = useSearchParams(); // Hook to get URL query params in the app directory
   const [divisionsList, setDivisionsList] = useState<Division[]>([]);
   const [selected, setSelected] = useState<string>("Overall");
 
@@ -20,6 +23,12 @@ export default function Standings() {
         if (divisions) {
           const sortedDivisionList = divisions.sort(divisionsSortedByRank);
           setDivisionsList(sortedDivisionList);
+
+          // Check for the division query parameter
+          const divisionFromQuery = searchParams.get("division");
+          if (divisionFromQuery) {
+            setSelected(divisionFromQuery);
+          }
         } else {
           toast.error("Failed to fetch results.");
         }
@@ -30,15 +39,19 @@ export default function Standings() {
     };
 
     fetchDivisions();
-  }, []);
+  }, [searchParams]); // Trigger useEffect if query parameters change
 
   function handleSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-    setSelected(e.target.value);
+    const selectedDivision = e.target.value;
+    setSelected(selectedDivision);
+
+    // Update the URL to reflect the selected division without reloading the page
+    router.push(`?division=${selectedDivision}`);
   }
 
   return (
     <div className="bg-sky-50 dark:bg-zinc-800/50 w-full flex justify-center">
-      <div className="flex-1 flex flex-col gap-10 items-center w-full md:max-w-6xl bg-sky-100 dark:bg-zinc-900">
+      <div className="flex-1 flex flex-col gap-2 items-center w-full md:max-w-6xl bg-sky-100 dark:bg-zinc-900">
         <div className="relative w-full h-80">
           <Image
             src="/banner.jpeg"
@@ -48,11 +61,11 @@ export default function Standings() {
             priority
           />
           <div className=" absolute bottom-3 left-0 my-4 ml-6 flex flex-col gap-3 w-fit">
-            <h2 className="font-medium text-4xl text-white leading-none align-text-bottom">
+            <h2 className="font-medium text-4xl text-sky-50 leading-none align-text-bottom">
               Leaderboard
             </h2>
             <div>
-              <select className="px-3 py-1" onChange={(e) => handleSelect(e)}>
+              <select className="px-3 py-1" onChange={handleSelect} value={selected}>
                 <option value="Overall">Overall</option>
                 {divisionsList.map((division, index) => (
                   <option key={index} value={division.division}>

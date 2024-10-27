@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
 
-
 export default function EditProfileForm() {
   const [formdata, setFormdata] = useState<File | null>(null);
   const supabase = createClient();
@@ -20,18 +19,37 @@ export default function EditProfileForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!formdata) {
+      // Handle the case where no file is selected
+      alert("Please select a file before uploading.");
+      return;
+    }
+
     const fileToUpload = formdata;
 
-    // const {
-    //   data: { user },
-    // } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    // const { data, error } = await supabase.storage
-    //   .from("profiles")
-    //   .upload(`${user?.id}/avatar`, fileToUpload, {
-    //     cacheControl: "3600",
-    //     upsert: true,
-    //   });
+    if (!user?.id) {
+      // Handle the case where user ID is not available
+      console.error("User not authenticated");
+      return;
+    }
+
+    const { data, error } = await supabase.storage
+      .from("profiles")
+      .upload(`${user.id}/avatar`, fileToUpload, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (error) {
+      console.error("Error uploading file:", error.message);
+    } else {
+      console.log("File uploaded successfully:", data);
+    }
   };
 
   return (

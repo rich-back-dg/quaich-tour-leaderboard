@@ -30,10 +30,10 @@ export async function addCourse(newCourse: unknown) {
 
   if (error) {
     console.log("Could not add Course: ", error);
-    redirect("/td");
+    redirect("/tddashboard");
   }
   console.log(data);
 
-  revalidatePath("/td")
-  redirect('/td')
+  revalidatePath("/tddashboard")
+  redirect('/tddashboard')
 }

@@ -14,9 +14,9 @@ export default async function UserAvatar() {
     .eq("id", user?.id)
     .single();
 
-  const { data: avatar } = supabase.storage
+  const { data: avatar, error } = await supabase.storage
     .from("profiles")
-    .getPublicUrl(`${user?.id}/avatar`);
+    .createSignedUrl(`${user?.id}/avatar`, 3600)
 
   function createAvatarFallback() {
     const fnameInitial = profile?.first_name.at(0);
@@ -26,7 +26,7 @@ export default async function UserAvatar() {
 
   return (
       <Avatar>
-        <AvatarImage src={avatar.publicUrl} alt="User Avatar Image" />
+        <AvatarImage src={avatar?.signedUrl} alt="User Avatar Image" className="object-cover"/>
         <AvatarFallback>{createAvatarFallback()}</AvatarFallback>
       </Avatar>
   );

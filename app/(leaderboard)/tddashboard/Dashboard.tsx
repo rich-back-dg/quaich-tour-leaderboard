@@ -1,7 +1,7 @@
 "use client";
 
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-import { TableIcon, Users, Calendar, Menu } from "lucide-react";
+import { TableIcon, Users, Calendar, Menu, MapPinned, FileUp } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { columns } from "./columns";
 import TournamentsList from "./_tournaments/TournamentsList";
@@ -58,7 +58,7 @@ export default function Dashboard() {
                 className="flex items-center gap-3 rounded-lg px-3 py-2 hover:font-semibold hover:bg-zinc-200/50"
                 onClick={() => setIdSelected("upload")}
               >
-                <TableIcon className="h-4 w-4" />
+                <FileUp className="h-4 w-4" />
                 Upload Results
               </Link>
               <Link
@@ -82,7 +82,7 @@ export default function Dashboard() {
                 className="flex items-center gap-3 rounded-lg px-3 py-2 hover:font-semibold hover:bg-zinc-200/50"
                 onClick={() => setIdSelected("courses")}
               >
-                <Calendar className="h-4 w-4" />
+                <MapPinned className="h-4 w-4" />
                 Courses
               </Link>
             </nav>
@@ -93,7 +93,7 @@ export default function Dashboard() {
       <div className="flex flex-col">
         {/* MOBILE SIDEBAR */}
         <header className="flex h-14 items-center gap-4 border-b px-4">
-          <Sheet open={sheetOpenState} >
+          <Sheet open={sheetOpenState} onOpenChange={setSheetOpenState}>
             <SheetTrigger asChild>
               <Button
                 variant="outline"
@@ -111,16 +111,14 @@ export default function Dashboard() {
                   href="#"
                   id="upload"
                   className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2"
-                  // onClick={(e) => handleSheetItemSelect(e)}
                 >
-                  <TableIcon className="h-5 w-5" />
+                  <FileUp className="h-5 w-5" />
                   Upload Results
                 </Link>
                 <Link
                   href="#"
                   id="players"
                   className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2"
-                  // onClick={(e) => handleSheetItemSelect(e)}
                 >
                   <Users className="h-5 w-5" />
                   Players
@@ -129,7 +127,6 @@ export default function Dashboard() {
                   href="#"
                   id="tournaments"
                   className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2"
-                  // onClick={(e) => handleSheetItemSelect(e)}
                 >
                   <Calendar className="h-5 w-5" />
                   Tournaments
@@ -138,9 +135,8 @@ export default function Dashboard() {
                   href="#"
                   id="courses"
                   className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2"
-                  // onClick={(e) => handleSheetItemSelect(e)}
                 >
-                  <TableIcon className="h-5 w-5" />
+                  <MapPinned className="h-5 w-5" />
                   Courses
                 </Link>
               </nav>
