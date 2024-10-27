@@ -29,7 +29,11 @@ type Props = {
   division: Division;
 };
 
-const pinImages = ["/qt-pin-gold.jpeg", "/qt-pin-silver.jpeg", "/qt-pin-bronze.jpeg"]
+const pinImages = [
+  { url: "/qt-pin-gold.png", size: 30 },
+  { url: "/qt-pin-silver.png", size: 27 },
+  { url: "/qt-pin-bronze.png", size: 25 },
+];
 
 export default function PodiumCard({ division }: Props) {
   const [divisionTopThree, setDivisionTopThree] = useState<DivisionTopThree[]>(
@@ -73,7 +77,7 @@ export default function PodiumCard({ division }: Props) {
   }
 
   return (
-    <Card className="relative rounded-none bg-sky-50 border-0 overflow-hidden">
+    <Card className="relative rounded-none bg-sky-50 dark:bg-zinc-900/50 border-0 overflow-hidden">
       <Image
         src="/qt-logo.webp"
         alt="Quaich Tour Logo"
@@ -89,29 +93,31 @@ export default function PodiumCard({ division }: Props) {
         </CardTitle>
       </CardHeader>
       <CardContent className="px-3 z-10 relative">
-        <Table className="">
-          <TableHeader>
-            <TableRow className="bg-sky-700 hover:bg-sky-700 h-12 text-[11px] leading-3 font-bold">
-              <TableHead className="text-center text-white uppercase">
+        <Table className="bg-white dark:bg-zinc-800">
+          <TableHeader className="bg-sky-900 hover:bg-sky-900 ">
+            <TableRow className="h-12 text-[11px] leading-3 font-bold">
+              <TableHead className="text-center text-white dark:text-sky-100 bg-sky-900 uppercase">
                 Pos
               </TableHead>
-              <TableHead className=" text-white uppercase">Name</TableHead>
-              <TableHead className="text-center text-white uppercase">
+              <TableHead className=" text-white uppercase dark:text-sky-100 bg-sky-900 ">
+                Name
+              </TableHead>
+              <TableHead className="text-center text-white dark:text-sky-100 bg-sky-900 uppercase">
                 Events
               </TableHead>
-              <TableHead className="text-center text-white uppercase">
+              <TableHead className="text-center text-white dark:text-sky-100 bg-sky-900 uppercase">
                 Avg. Points
               </TableHead>
-              <TableHead className="text-center text-white uppercase">
+              <TableHead className="text-center text-white dark:text-sky-100 bg-sky-900 uppercase">
                 Points
               </TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className="bg-white">
+          <TableBody>
             {divisionTopThree.map((player) => (
               <TableRow
                 key={player.name}
-                className="first:text-[14px] text-[13px] first:font-semibold h-12 border-b-0"
+                className="first:text-[14px] text-[13px] first:font-semibold h-12 border-b-0 dark:border-b-zinc-600"
               >
                 <TableCell className="">
                   {/* <TrophyIcon
@@ -119,7 +125,13 @@ export default function PodiumCard({ division }: Props) {
                       player.rank
                     )}`}
                   /> */}
-                  <Image src={pinImages[player.rank - 1]} alt="qt pin icon" width={25} height={25} className="mx-auto"/>
+                  <Image
+                    src={pinImages[player.rank - 1].url}
+                    alt="qt pin icon"
+                    width={pinImages[player.rank - 1].size}
+                    height={pinImages[player.rank - 1].size}
+                    className="mx-auto"
+                  />
                 </TableCell>
                 <TableCell className="">{player.name}</TableCell>
                 <TableCell className="text-center">
@@ -141,7 +153,7 @@ export default function PodiumCard({ division }: Props) {
           href={`/?division=${division.division}`}
           className="flex gap-1 justify-center items-center"
         >
-          <p className="text-sky-900">Full Division Results </p>
+          <p className="text-sky-900 dark:text-sky-100">Full Division Results </p>
           <SquareArrowOutUpRight size={13} />
         </Link>
       </CardFooter>

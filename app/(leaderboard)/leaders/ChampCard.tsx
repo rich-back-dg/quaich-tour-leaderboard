@@ -9,7 +9,7 @@ type Props = {
 
 export default function ChampCard({ champion }: Props) {
   return (
-    <div className="relative h-80 w-full border overflow-hidden aspect-square">
+    <div className="relative h-80 w-full overflow-hidden aspect-square">
       <Image
         src="/RickRick2.jpeg"
         alt="RickRick"
