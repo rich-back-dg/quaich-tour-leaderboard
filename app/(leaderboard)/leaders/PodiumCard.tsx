@@ -29,6 +29,8 @@ type Props = {
   division: Division;
 };
 
+const pinImages = ["/qt-pin-gold.jpeg", "/qt-pin-silver.jpeg", "/qt-pin-bronze.jpeg"]
+
 export default function PodiumCard({ division }: Props) {
   const [divisionTopThree, setDivisionTopThree] = useState<DivisionTopThree[]>(
     []
@@ -77,7 +79,7 @@ export default function PodiumCard({ division }: Props) {
         alt="Quaich Tour Logo"
         width={270}
         height={270}
-        className="absolute -bottom-14 -left-24 z-0 opacity-20"
+        className="absolute -bottom-14 -left-24 z-0 opacity-10"
       />
       <CardHeader className="px-3 py-3 z-10 relative">
         <CardTitle>
@@ -112,11 +114,12 @@ export default function PodiumCard({ division }: Props) {
                 className="first:text-[14px] text-[13px] first:font-semibold h-12 border-b-0"
               >
                 <TableCell className="">
-                  <TrophyIcon
-                    className={`mx-auto self-center ${trophyColour(
+                  {/* <TrophyIcon
+                    className={`mx-auto ${trophyColour(
                       player.rank
                     )}`}
-                  />
+                  /> */}
+                  <Image src={pinImages[player.rank - 1]} alt="qt pin icon" width={25} height={25} className="mx-auto"/>
                 </TableCell>
                 <TableCell className="">{player.name}</TableCell>
                 <TableCell className="text-center">
