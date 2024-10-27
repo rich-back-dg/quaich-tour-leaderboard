@@ -58,6 +58,22 @@ export async function getTournaments(): Promise<Tournament[] | null> {
   }
 }
 
+export async function getResults(): Promise<PlayerResult[] | null> {
+  try {
+    const { data: results_data, error } = await supabase
+      .from("results")
+      .select("*")
+
+    if (error) {
+      throw new Error(`Could not fetch Results data: ${error.message}`);
+    }
+    return results_data || null;
+  } catch (error) {
+    console.error("Error fetching Results: ", error);
+    return null;
+  }
+}
+
 export async function getPlayers(): Promise<Player[] | null> {
   try {
     const { data: players_data, error } = await supabase
