@@ -42,6 +42,11 @@ const config = {
         "caret-blink": "caret-blink 1.25s ease-out infinite",
 
       },
+      colors: {
+        'gold': '#FFD700',
+        'silver': '#C0C0C0',
+        'bronze': '#CE8946',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
