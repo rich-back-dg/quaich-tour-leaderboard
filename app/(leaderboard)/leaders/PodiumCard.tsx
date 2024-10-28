@@ -30,9 +30,9 @@ type Props = {
 };
 
 const pinImages = [
-  { url: "/qt-pin-gold.png", size: 30, color: "ring-gold" },
-  { url: "/qt-pin-silver.png", size: 27, color: "ring-silver" },
-  { url: "/qt-pin-bronze.png", size: 25, color: "ring-bronze" },
+  { url: "/qt-pin-gold.png", size: 'w-7 h-7', color: "ring-gold" },
+  { url: "/qt-pin-silver.png", size: 'w-6 h-6', color: "ring-silver" },
+  { url: "/qt-pin-bronze.png", size: 'w-5 h-5', color: "ring-bronze" },
 ];
 
 export default function PodiumCard({ division }: Props) {
@@ -74,11 +74,11 @@ export default function PodiumCard({ division }: Props) {
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-3 z-10 relative">
+      <CardContent className="px-2 z-10 relative">
         <Table className="bg-white dark:bg-zinc-800">
           <TableHeader className="bg-sky-900 hover:bg-sky-900 ">
             <TableRow className="h-12 text-[11px] leading-3 font-bold">
-              <TableHead className="text-white dark:text-sky-100 bg-sky-900">
+              <TableHead className="text-white dark:text-sky-100 bg-sky-900 w-14">
                 <div className="flex items-center justify-center">
                   <Medal
                     size={18}
@@ -88,7 +88,7 @@ export default function PodiumCard({ division }: Props) {
                   />
                 </div>
               </TableHead>
-              <TableHead className=" text-white uppercase dark:text-sky-100 bg-sky-900 ">
+              <TableHead className="text-white uppercase dark:text-sky-100 bg-sky-900">
                 Name
               </TableHead>
               <TableHead className="text-center text-white dark:text-sky-100 bg-sky-900 uppercase">
@@ -108,13 +108,13 @@ export default function PodiumCard({ division }: Props) {
                 key={player.name}
                 className="first:text-[14px] text-[13px] first:font-semibold h-12 border-b-0 dark:border-b-zinc-600"
               >
-                <TableCell>
+                <TableCell className="w-">
                   <Image
                     src={pinImages[player.rank - 1].url}
                     alt="qt pin icon"
-                    width={pinImages[player.rank - 1].size}
-                    height={pinImages[player.rank - 1].size}
-                    className={`mx-auto ring-2 ${
+                    width={420}
+                    height={420}
+                    className={`${pinImages[player.rank - 1].size} mx-auto ring-2 ${
                       pinImages[player.rank - 1].color
                     } rounded-full`}
                   />
