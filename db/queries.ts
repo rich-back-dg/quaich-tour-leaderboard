@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "../utils/supabase/server";
-import { Course, Division, LeaderboardResults, Player, Tournament } from "@/lib/types";
+import { Course, Division, DivisionTopThree, DivisionWinner, LeaderboardResults, Player, PlayerResult, Tournament } from "@/lib/types";
 import { Layout } from "@/lib/types";
 
 const supabase = createClient();
@@ -41,6 +41,44 @@ export async function getLayoutsForCourse(
   }
 }
 
+export async function getDivisionWinnersForTournament(
+  tournament_id_to_search: string
+): Promise<DivisionWinner[] | null> {
+  try {
+    const { data, error } = await supabase
+    .rpc('get_first_place_players', {
+      tournament_id_to_search
+    })
+    if (error) {
+      throw new Error(`Could not fetch division winners data: ${error.message}`);
+    }
+
+    return data || null;
+  } catch (error) {
+    console.error("Error fetching division winners: ", error);
+    return null;
+  }
+}
+
+export async function getDivisionTopThree(
+  p_division: string
+): Promise<DivisionTopThree[] | null> {
+  try {
+    const { data, error } = await supabase
+    .rpc('get_top_players_by_division', {
+      p_division
+    })
+    if (error) {
+      throw new Error(`Could not fetch division top 3 data: ${error.message}`);
+    }
+    
+    return data || null;
+  } catch (error) {
+    console.error("Error fetching division top 3: ", error);
+    return null;
+  }
+}
+
 export async function getTournaments(): Promise<Tournament[] | null> {
   try {
     const { data: tournaments_data, error } = await supabase
@@ -54,6 +92,22 @@ export async function getTournaments(): Promise<Tournament[] | null> {
     return tournaments_data || null;
   } catch (error) {
     console.error("Error fetching Tournaments: ", error);
+    return null;
+  }
+}
+
+export async function getResults(): Promise<PlayerResult[] | null> {
+  try {
+    const { data: results_data, error } = await supabase
+      .from("results")
+      .select("*")
+
+    if (error) {
+      throw new Error(`Could not fetch Results data: ${error.message}`);
+    }
+    return results_data || null;
+  } catch (error) {
+    console.error("Error fetching Results: ", error);
     return null;
   }
 }
@@ -90,6 +144,27 @@ export async function getLeaderboardData(): Promise<LeaderboardResults[] | null>
     
   } catch (error) {
     console.error("Error fetching Leaderboard Data: ", error)
+    return null;
+  }
+}
+
+export async function getChampionData(): Promise<LeaderboardResults | null> {
+
+  try {
+    const { data: championData, error } = await supabase
+      .from("tour_leaderboard_view")
+      .select()
+      .eq("rank", 1)
+      .single()
+  
+    if (error) {
+      console.error("Could not fetch champion data: ", error.message);
+    }
+  
+    return championData ?? {};
+    
+  } catch (error) {
+    console.error("Error fetching Champion Data: ", error)
     return null;
   }
 }

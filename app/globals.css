@@ -53,3 +53,11 @@
     display: none;
   }
 }
+
+#underline {
+  position: absolute;
+  bottom: 0;
+  height: 3px;
+  background-color: #0ea5e9; /* Sky blue */
+  transition: transform 0.4s ease, width 0.4s ease; /* Animate both width and transform */
+}

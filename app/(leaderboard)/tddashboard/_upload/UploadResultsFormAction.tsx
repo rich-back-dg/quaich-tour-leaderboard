@@ -4,10 +4,11 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { Player, uploadFormSchema } from "@/lib/types";
+import { playerChecker } from "@/lib/utils";
 
 const supabase = createClient();
 
-interface PlayerData {
+export interface PlayerData {
   Total: string;
   FirstName: string;
   LastName: string;
@@ -26,8 +27,7 @@ interface PlayerUpdate {
   has_no_pdga_num: boolean;
 }
 
-// Function to insert all data
-async function insertData(jsonData: PlayerData[], formData: any) {
+async function upsertTournament(formData: any) {
   // Upsert Tournament
   const { data: tournamentData, error: tournamentError } = await supabase
     .from("tournaments")
@@ -42,15 +42,18 @@ async function insertData(jsonData: PlayerData[], formData: any) {
     .select("id")
     .single();
 
-  let tournamentID: string | undefined;
+  let tournamentId: string;
 
   if (tournamentData) {
-    tournamentID = tournamentData.id;
+    tournamentId = tournamentData.id;
   } else {
     console.error(tournamentError);
     return;
   }
+  return tournamentId;
+}
 
+async function upsertPlayers(jsonData: PlayerData[]) {
   // Fetch all existing players from the database
   const { data: existingPlayers, error: existingPlayersError } = await supabase
     .from("players")
@@ -63,42 +66,11 @@ async function insertData(jsonData: PlayerData[], formData: any) {
 
   const newPlayers: PlayerData[] = [];
   const updatePlayers: PlayerUpdate[] = [];
-  let allPlayerData: any[] = existingPlayers || [];
+  let allPlayerData = existingPlayers || [];
 
   if (existingPlayers && existingPlayers.length > 0) {
-    console.log("IF STATEMENT RAN");
-
     // Step 1: Check for existing players where pdga_num matches
-    jsonData.forEach((player) => {
-      const existingPlayer = existingPlayers.find(
-        (existingPlayer: Player) => existingPlayer.pdga_num === player.PDGANum
-      );
-
-      if (existingPlayer) {
-        // Player already exists with this PDGA number
-        return;
-      }
-
-      // Step 2: Check for existing players where firstName and lastName match and has_no_pdga_num is true
-      const potentialMatch = existingPlayers.find(
-        (existingPlayer: Player) =>
-          existingPlayer.first_name === player.FirstName &&
-          existingPlayer.last_name === player.LastName &&
-          existingPlayer.has_no_pdga_num
-      );
-
-      if (potentialMatch) {
-        // Update existing player with new PDGA number
-        updatePlayers.push({
-          id: potentialMatch.id!,
-          pdga_num: player.PDGANum,
-          has_no_pdga_num: false,
-        });
-      } else {
-        // New player
-        newPlayers.push(player);
-      }
-    });
+    playerChecker(jsonData, existingPlayers, updatePlayers, newPlayers);
 
     // Insert new players
     const { data: newPlayerData, error: newPlayerError } = await supabase
@@ -110,21 +82,18 @@ async function insertData(jsonData: PlayerData[], formData: any) {
           pdga_num: row.PDGANum,
           division: row.Division,
           has_no_pdga_num: row.hasNoPDGANum,
-        })),
+        }))
       )
       .select();
 
     if (newPlayerError) {
       console.error(newPlayerError);
-    }
-
-    // Merge new player data if any
-    if (newPlayerData) {
+    } else if (newPlayerData) {
       allPlayerData = allPlayerData.concat(newPlayerData);
     }
 
     // Update existing players with new PDGA numbers
-    for (const player of updatePlayers) {
+    const updatePromises = updatePlayers.map(async (player) => {
       const { error: updatePlayerError } = await supabase
         .from("players")
         .update({
@@ -134,12 +103,15 @@ async function insertData(jsonData: PlayerData[], formData: any) {
         .eq("id", player.id);
 
       if (updatePlayerError) {
-        console.error(updatePlayerError);
+        console.error(`Error updating player ${player.id}:`, updatePlayerError);
       }
-    }
+    });
+
+    // Wait for all update promises to complete
+    await Promise.all(updatePromises);
 
     // Fetch updated players to ensure accurate allPlayerData
-    const updatedPlayerIDs = updatePlayers.map(player => player.id);
+    const updatedPlayerIDs = updatePlayers.map((player) => player.id);
     const { data: updatedPlayers, error: updatedPlayersError } = await supabase
       .from("players")
       .select()
@@ -152,9 +124,7 @@ async function insertData(jsonData: PlayerData[], formData: any) {
     if (updatedPlayers) {
       allPlayerData = allPlayerData.concat(updatedPlayers);
     }
-
   } else {
-    console.log("ELSE STATEMENT RAN");
     // Insert all players
     const { data: playerData, error: playerError } = await supabase
       .from("players")
@@ -169,8 +139,6 @@ async function insertData(jsonData: PlayerData[], formData: any) {
       )
       .select();
 
-    console.log(playerData);
-
     if (playerError) {
       console.error(playerError);
       return;
@@ -180,19 +148,25 @@ async function insertData(jsonData: PlayerData[], formData: any) {
       allPlayerData = playerData;
     }
   }
+  return allPlayerData;
+}
 
-  // Upsert Results for each player
-  for (let i = 0; i < jsonData.length; i++) {
+async function upsertResults(
+  jsonData: PlayerData[],
+  allPlayerData: any[],
+  tournamentID: string
+) {
+  const upsertPromises = jsonData.map(async (playerData) => {
     const currentPlayer = allPlayerData.find(
-      (player) => player.pdga_num === jsonData[i].PDGANum
+      (player) => player.pdga_num === playerData.PDGANum
     );
 
     if (!currentPlayer) {
-      console.error(`Player with PDGANum ${jsonData[i].PDGANum} not found.`);
-      continue;
+      console.error(`Player with PDGANum ${playerData.PDGANum} not found.`);
+      return;
     }
 
-    const currentPlayerID = currentPlayer.id;
+    const { id: currentPlayerID } = currentPlayer;
 
     const { error: resultsError } = await supabase
       .from("results")
@@ -200,21 +174,56 @@ async function insertData(jsonData: PlayerData[], formData: any) {
         {
           tournament_id: tournamentID,
           player_id: currentPlayerID,
-          total: jsonData[i].Total,
-          prize: jsonData[i].Prize,
-          division: jsonData[i].Division,
-          division_placing: jsonData[i].Place,
-          overall_placing: jsonData[i].overall_placing,
-          event_points: jsonData[i].event_points,
+          total: playerData.Total,
+          prize: playerData.Prize,
+          division: playerData.Division,
+          division_placing: playerData.Place,
+          overall_placing: playerData.overall_placing,
+          event_points: playerData.event_points,
         },
       ])
       .select("id");
 
     if (resultsError) {
-      console.log(resultsError.message);
+      console.error(
+        `Error upserting results for player ${playerData.PDGANum}: ${resultsError.message}`
+      );
     }
+  });
+
+  // Run all upsert operations concurrently
+  await Promise.all(upsertPromises);
+}
+
+// Function to insert all data
+async function insertData(jsonData: PlayerData[], formData: any) {
+  try {
+    // Step 1: Upsert Tournament and handle failure
+    const tournamentId = await upsertTournament(formData);
+    if (!tournamentId) {
+      throw new Error('Failed to upsert tournament.');
+    }
+
+    // Step 2: Upsert Players and handle failure
+    const allPlayerData = await upsertPlayers(jsonData);
+    if (!allPlayerData || allPlayerData.length === 0) {
+      throw new Error('Failed to upsert players.');
+    }
+
+    // Step 3: Upsert Results (final step)
+    await upsertResults(jsonData, allPlayerData, tournamentId);
+    
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error inserting data:", error.message);
+    } else {
+      console.error("Unknown error:", error);
+    }
+    // Optionally return or throw the error to inform the caller
   }
 }
+
+
 
 export async function uploadResults(newUpload: unknown) {
   const result = uploadFormSchema.safeParse(newUpload);
@@ -232,7 +241,9 @@ export async function uploadResults(newUpload: unknown) {
 
   const dataToAdd = result.data.fileData;
 
-  await insertData(dataToAdd, result.data);  // Ensure async is awaited
+  console.log(dataToAdd)
+
+  await insertData(dataToAdd, result.data); // Ensure async is awaited
 
   revalidatePath("/tddashboard");
   redirect("/tddashboard");

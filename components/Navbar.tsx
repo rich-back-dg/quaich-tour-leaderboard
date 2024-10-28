@@ -13,8 +13,8 @@ type Props = {
 export default function Navbar({ user }: Props) {
   return (
     <nav className="w-full flex justify-center border-b border-zinc-50 h-14 bg-sky-900">
-      <div className="w-full max-w-6xl flex justify-between items-center px-3 text-sm">
-        <div className="flex justify-between items-center gap-3">
+      <div className="w-full max-w-6xl flex justify-between items-center px-2 text-sm relative">
+        <div className="relative flex items-center gap-3">
           <Image
             src="/qt-logo.webp"
             alt="Quaich Tour Logo"
@@ -22,16 +22,19 @@ export default function Navbar({ user }: Props) {
             height={40}
             className="ring-1 ring-sky-100 rounded-full"
           />
-          <div className="flex">
+          <div className="relative flex">
+            {/* Shared underline for NavLinks */}
+            <div
+              id="underline"
+            ></div>
             <NavLink href="/" title="Leaderboard" />
-            {/* <NavLink href="/results" title="Results" /> */}
+            <NavLink href="/leaders" title="Winners" />
           </div>
         </div>
-        <div className="flex justify-between items-center p-3 gap-3">
+        <div className="flex items-center">
           <AuthButton />
           {user && <AdminButton />}
           <ModeToggle />
-          {user && <UserAvatar />}
         </div>
       </div>
     </nav>
