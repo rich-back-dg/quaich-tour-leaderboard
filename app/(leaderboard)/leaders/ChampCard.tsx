@@ -12,11 +12,11 @@ export default function ChampCard({ champion }: Props) {
   return (
     <div className="relative h-80 w-full overflow-hidden aspect-square">
       <Image
-        src="/RickRick2.jpeg"
+        src="/rick-rick-3768.jpg"
         alt="RickRick"
         priority
-        width={100}
-        height={100}
+        width={1638}
+        height={2048}
         className="max-w-[600px] w-full h-full object-cover object-[100%_15%]"
       />
       <Image
